@@ -618,3 +618,5 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
  .focus-mode .workspace{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "chat" "prompts" "composer";column-gap:0}
  .focus-mode .right-panel{display:none}
 }
+
+.composer-icon svg { width: 17px; height: 17px; display: block; stroke: currentColor; }
