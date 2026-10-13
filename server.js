@@ -11,7 +11,9 @@ const upload = multer({
 });
 
 app.use(express.json({ limit: "1mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/style.css", (_req, res) => res.sendFile(path.join(__dirname, "style.css")));
+app.get("/app.js", (_req, res) => res.sendFile(path.join(__dirname, "app.js")));
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, aiConfigured: Boolean(process.env.GROQ_API_KEY) });
