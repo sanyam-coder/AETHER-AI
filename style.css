@@ -569,3 +569,52 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   body::before, .brand-mark::after, .core-halo, .orbit, .spark { animation: none !important; }
 }
+
+
+/* AETHER daylight skin — visual only. Existing moving-logo and orbit rules stay unchanged. */
+:root{color-scheme:light;--bg:#f3f4fa;--sidebar:#fafaff;--surface:#fff;--surface-raised:#fbfbff;--surface-soft:#f1f1fb;--line:#e2e4ef;--line-strong:#d2d5e4;--text:#1d2136;--muted:#555c72;--subtle:#646c82;--accent:#7057e8;--accent-strong:#5d45d2;--cyan:#198d9d;--green:#199a70;--shadow:0 14px 38px rgba(52,48,105,.09)}
+html,body{background:var(--bg);color:var(--text)}
+body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15),transparent 29%),radial-gradient(ellipse at 88% 28%,rgba(99,194,208,.13),transparent 32%),radial-gradient(ellipse at 56% 97%,rgba(246,190,219,.12),transparent 34%)}
+.app-shell,.main-area{background:transparent}
+.sidebar{border-right-color:#e4e5ef;background:linear-gradient(180deg,#fff,#f9f9ff 60%,#f4f4fc)}
+.brand{color:#21233b}.brand-mark{border-color:#d7d1fb;background:linear-gradient(145deg,#eeeaff,#d9d4fa);box-shadow:0 6px 18px rgba(100,76,205,.13)}.brand-mark span{color:#634fd1}.brand-copy strong{color:#1c2037}.brand-copy strong i{color:#765fe2}.brand-copy small{color:#6f7589}
+.new-chat{border-color:#715de3;background:linear-gradient(110deg,#745ee7,#8c69e8 58%,#6c9be8);color:#fff;box-shadow:0 8px 19px rgba(111,85,214,.2)}.new-chat:hover{border-color:#5f49ce;background:linear-gradient(110deg,#644bd8,#805bdd 58%,#5a8ddd)}.new-chat span{color:#fff}
+.nav-item{color:#5e647a}.nav-item:hover,.recent-item:hover{background:#f0effb;color:#292b46}.nav-item.active{border-color:#ded9fb;background:linear-gradient(105deg,#efecff,#f8f6ff);color:#4e3cae;box-shadow:inset 3px 0 #8068e8}.nav-item.active .nav-icon,.nav-icon{color:#7769bd}
+.recent-heading{border-top-color:#e4e5ef;color:#555c73}.recent-heading>span,.recent-heading small,.recent-empty,.sidebar-footer small{color:#6f768a}.recent-item{color:#5f6579}.recent-item.active{border-color:#e0dcf6;background:#f0edff;color:#3f3780}.recent-item>span:first-child{color:#8176c1}.sidebar-footer{border-color:#e5e6f0;background:rgba(255,255,255,.86);box-shadow:0 5px 18px rgba(47,49,91,.04)}.sidebar-footer strong{color:#34364d}.sound-wave{color:#7663ce}
+.topbar{border-bottom-color:#e1e3ee;background:rgba(255,255,255,.9);box-shadow:0 5px 20px rgba(54,55,98,.035)}.searchbar{border-color:#e2e4ef;background:#f8f8fc}.searchbar:focus-within{border-color:#a99bea;background:#fff;box-shadow:0 0 0 3px rgba(121,94,220,.09)}.searchbar>span{color:#7d72bd}.searchbar input{color:#262940}.searchbar input::placeholder{color:#70778c}
+.online-indicator{color:#535c72}.online-indicator i{background:#21a77a}.online-indicator b,.online-indicator span{color:#6c7388}.language-select{border-color:#e1e3ee;background:#fff;color:#777e92}.language-select select{color:#35384e}.language-select option,.response-mode option{background:#fff;color:#262940}
+.icon-button,.profile-button,.mobile-menu{border-color:#dedfeb;background:#fff;color:#5e5b7b;box-shadow:0 3px 10px rgba(54,55,98,.05)}.icon-button:hover,.mobile-menu:hover{border-color:#bfb7eb;background:#f6f4ff}.profile-button{border-color:#ded7fb;background:#ede9ff;color:#5c48c2}
+.studio-action{border-color:#e0dff0;background:#fff;color:#585b73;box-shadow:0 3px 10px rgba(54,55,98,.045)}.studio-action:hover{border-color:#c7bdf4;background:#f7f5ff}.studio-action[aria-pressed=true]{border-color:#bdb0ef;background:#efebff;color:#5740b2}.export-action{border-color:#c9e7e8;color:#287c84}.export-action:hover{border-color:#86ccd0;background:#f0fbfb}
+.workspace{grid-template-columns:minmax(0,1fr) 310px}.center-panel{border-right-color:#e1e3ee}
+/* Keep the dark orbital hero and moving logo visually intact. */
+.feature-card{border-color:#e6e5f0;background:linear-gradient(145deg,#fff,#fafaff);box-shadow:0 5px 16px rgba(44,48,89,.035)}.feature-card:hover{border-color:#c9c1ef;background:#fff;box-shadow:0 10px 23px rgba(64,52,130,.09)}.feature-card.blue .feature-icon{border-color:#d9e0fc;background:#eef2ff;color:#5468c9}.feature-card.violet .feature-icon,.feature-card.purple .feature-icon{border-color:#e1d8fb;background:#f3eeff;color:#7954c6}.feature-card.teal .feature-icon,.feature-card.cyan .feature-icon{border-color:#cfebeb;background:#eaf8f7;color:#2b8b89}.feature-card.pink .feature-icon{border-color:#f3d9ea;background:#fff0f8;color:#ba5a99}.feature-card.amber .feature-icon{border-color:#f2e4c5;background:#fff8e8;color:#a37a2d}.feature-card b{color:#31344c}.feature-card small{color:#6a7186}
+.message-bubble{border-color:#e5e6ef;background:#fff;color:#2c3047;box-shadow:0 7px 23px rgba(43,47,91,.055)}.message-bubble .message-name{color:#6658ae}.chat-message.user .message-bubble{border-color:#d9d2f8;background:linear-gradient(135deg,#f3f0ff,#ecefff);color:#302d4b}.assistant-avatar{border-color:#d9d2f6;background:linear-gradient(145deg,#eae6ff,#d7d2f8);color:#604cc8;box-shadow:0 4px 13px rgba(100,76,205,.1)}.chat-message.user .assistant-avatar{border-color:#ded8f5;background:#ece9fb;color:#6958be}.message-bubble a{color:#5e4bc2}.message-bubble a:hover{color:#36268f}.message-bubble pre{border-color:#30364d;background:#171b2a;color:#f2f2fa}.message-bubble code{background:#eeedf6;color:#4e4673}.message-bubble pre code{color:#f2f2fa}
+.message-actions .message-action-button,.message-actions .reply-speak-button{border-color:#e3e2ef;background:#f8f8fc;color:#656b80}.message-actions .message-action-button:hover,.message-actions .reply-speak-button:hover{border-color:#c4bbed;background:#f1edff;color:#4e3ba9}.copy-code-button{border-color:#4a5068;background:#292e41;color:#e9e8f6}
+.prompt-chips button{border-color:#e3e2ef;background:#fff;color:#5b6178;box-shadow:0 3px 9px rgba(43,47,91,.035)}.prompt-chips button:hover{border-color:#c9c0f0;background:#f7f5ff;color:#4e3ba9}.file-attachment{color:#5b4db0}.composer{border-color:#dcddeb;background:rgba(255,255,255,.97);box-shadow:0 13px 35px rgba(41,43,85,.1),inset 0 1px #fff}.composer:focus-within{border-color:#a999e8;box-shadow:0 0 0 4px rgba(118,94,217,.1),0 15px 40px rgba(41,43,85,.12)}textarea{color:#252940}textarea::placeholder{color:#777d91}.composer-icon{color:#73778d}.composer-icon:hover{border-color:#e0dcf3;background:#f4f1ff;color:#5d48ba}.composer-hint,.response-mode-label,.footnote{color:#6d7489}.mic-button{border-color:#e1e0ec;background:#f7f7fb;color:#5e5b7b}.mic-button:hover{border-color:#c8c0ee;background:#f0edff}.send-button{background:linear-gradient(135deg,#735be3,#9b65dc 58%,#54b8bf);box-shadow:0 5px 14px rgba(109,83,210,.26)}.send-button:hover{background:linear-gradient(135deg,#634bd3,#8c54cf 58%,#43aab3)}.response-mode{border-color:#e0dfec;background:#f9f8fe;color:#555871}
+.right-panel{border-left:1px solid #e6e6f0;background:rgba(248,248,253,.82)}.promo-card{border-color:#e1dcf4;background:radial-gradient(ellipse at 82% 20%,rgba(166,142,238,.2),transparent 38%),linear-gradient(135deg,#f3f0ff,#fdfcff 63%,#eaf8fb);box-shadow:0 7px 22px rgba(49,45,98,.055)}.eyebrow{color:#7569aa}.promo-card h2{color:#302d4d}.promo-card h2 span{color:#7459cc}.promo-card p,.free-note small{color:#6d7489}.promo-lines i{background:#8167d9}.promo-lines i:nth-child(2){background:#a08adb}.promo-lines i:nth-child(3){background:#b8b1d5}.moon-art{background:radial-gradient(ellipse at 60% 45%,rgba(120,102,220,.17),transparent 67%)}.moon{border-color:rgba(119,104,193,.28);background:radial-gradient(circle at 34% 30%,#fff,#c5b9f2 55%,#8979c9);box-shadow:0 0 28px rgba(122,101,206,.22)}.mountain{border-bottom-color:#d8d2ed;opacity:.7}.m2{border-bottom-color:#c9c3e5}.m3{border-bottom-color:#b7afd9}
+.side-card{border-color:#e5e5ef;background:rgba(255,255,255,.97);box-shadow:0 6px 18px rgba(42,45,87,.045)}.side-card h3{color:#363950}.heading-spark,.bulb,.language-card h3>span{color:#7663cb}.quick-action{border-color:#e7e6f1;background:linear-gradient(145deg,#fff,#f8f7fd)}.quick-action:hover{border-color:#c9c1ed;background:#f4f1ff}.quick-action>span{color:#7865ce}.quick-action b{color:#565a72}.quick-action i,.popular-prompt span{color:#777d91}.quick-action.violet>span{color:#865fc4}.quick-action.teal>span{color:#278f91}.quick-action.amber>span{color:#aa813a}.popular-prompt,.language-list button{color:#60667a}.popular-prompt:hover,.language-list button:hover{border-color:#e1dcf3;background:#f7f5ff;color:#4b3ca2}.more-languages{border-color:#d9d5eb;color:#7165ac}.free-note{color:#666c80}.free-note>span{color:#8069d1}.free-note b{color:#484d64}.toast{border-color:#51477e;background:#302a4a;color:#fff;box-shadow:0 10px 30px rgba(36,31,67,.22)}
+@media(max-width:1240px){.workspace{grid-template-columns:minmax(0,1fr) 278px}}
+@media(max-width:650px){.sidebar{background:linear-gradient(180deg,#fff,#f7f6fd);box-shadow:15px 0 40px rgba(47,44,86,.14)}.topbar{background:rgba(255,255,255,.95)}.mobile-menu{border-color:#e0dfec;background:#fff;color:#5e4fc0}}
+
+
+/* New desktop composition: full-width signature hero above the chat canvas and tool rail. */
+@media(min-width:961px){
+ .workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;grid-template-rows:auto minmax(210px,1fr) auto auto;grid-template-areas:"hero hero" "chat tools" "prompts tools" "composer tools";column-gap:20px;padding:0 20px 18px}
+ .center-panel{display:contents}
+ .hero{grid-area:hero;margin:14px 0 12px}
+ .chat-area{grid-area:chat;width:100%;max-width:900px;min-height:210px;margin:0 auto;padding:10px 8px}
+ .prompt-chips{grid-area:prompts;align-self:center;margin:5px auto 12px}
+ .composer-wrap{grid-area:composer;width:100%;max-width:900px;margin:0 auto;padding:0 8px 12px}
+ .right-panel{grid-area:tools;align-self:stretch;padding:16px 0 10px 16px;border-left:1px solid #e4e5ef;background:transparent}
+}
+@media(max-width:960px){
+ .workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:none;padding:0}
+ .center-panel{display:flex}
+ .hero,.chat-area,.prompt-chips,.composer-wrap,.right-panel{grid-area:auto;grid-row:auto}
+ .right-panel{padding:13px 11px;border-left:0}
+}
+
+@media(min-width:961px){
+ .focus-mode .workspace{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "chat" "prompts" "composer";column-gap:0}
+ .focus-mode .right-panel{display:none}
+}
