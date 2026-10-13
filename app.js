@@ -7,6 +7,16 @@ const fileAttachment = $("fileAttachment");
 const STORAGE = "aether-ai-threads-v1";
 const ACTIVE_STORAGE = "aether-ai-active-thread-v1";
 const LEGACY_STORAGE = "aether-ai-history-v1";
+const RESPONSE_MODE_STORAGE = "aether-ai-response-mode-v1";
+const FOCUS_MODE_STORAGE = "aether-ai-focus-mode-v1";
+const RESPONSE_MODES = {
+  balanced: "Give a clear, useful answer with enough detail to act on.",
+  quick: "Answer directly and briefly. Prefer a short list when useful.",
+  deep: "Give a thorough answer with reasoning, examples, and important caveats.",
+  tutor: "Teach step by step. Check assumptions, explain unfamiliar terms, and include a small example.",
+  builder: "Think like a practical engineer. Give actionable steps, runnable examples, and note trade-offs.",
+  creative: "Explore original ideas and vivid options. Avoid generic suggestions and explain the strongest choice."
+};
 const MAX_THREADS = 10;
 const MAX_MESSAGES = 40;
 const MAX_SAVED_MESSAGE_CHARS = 12000;
@@ -134,8 +144,33 @@ function drawMessage(message) {
   }
   const body = document.createElement("div");
   body.innerHTML = formatted(message.content);
+  body.querySelectorAll("pre").forEach(pre => {
+    const code = pre.querySelector("code");
+    if (!code) return;
+    const copyCode = document.createElement("button");
+    copyCode.type = "button";
+    copyCode.className = "copy-code-button";
+    copyCode.textContent = "Copy code";
+    copyCode.addEventListener("click", async () => {
+      try { await copyText(code.textContent, "Code copied."); }
+      catch { toast("Could not copy code in this browser."); }
+    });
+    pre.appendChild(copyCode);
+  });
   bubble.appendChild(body);
   if (message.role !== "user") {
+    const actions = document.createElement("div");
+    actions.className = "message-actions";
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "message-action-button";
+    copyButton.textContent = "⧉ Copy";
+    copyButton.title = "Copy this reply";
+    copyButton.addEventListener("click", async () => {
+      try { await copyText(message.content, "Reply copied."); }
+      catch { toast("Could not copy this reply in your browser."); }
+    });
+    actions.appendChild(copyButton);
     const speakButton = document.createElement("button");
     speakButton.type = "button";
     speakButton.className = "reply-speak-button";
@@ -159,7 +194,8 @@ function drawMessage(message) {
       utterance.onerror = () => { speakButton.textContent = "🔊 Read aloud"; toast("Could not play this reply. Try again."); };
       speechSynthesis.speak(utterance);
     });
-    bubble.appendChild(speakButton);
+    actions.appendChild(speakButton);
+    bubble.appendChild(actions);
   }
   row.append(avatar, bubble);
   chatArea.appendChild(row);
@@ -213,6 +249,8 @@ async function send(text) {
   chatArea.scrollTop = chatArea.scrollHeight;
   const apiMessages = messages.slice(-12).map(m => ({ role: m.role, content: m.content }));
   apiMessages[apiMessages.length - 1] = { role: "user", content: promptText };
+  const selectedMode = $("responseMode")?.value || "balanced";
+  apiMessages[apiMessages.length - 1].content += `\n\n[AETHER response style: ${RESPONSE_MODES[selectedMode] || RESPONSE_MODES.balanced}]`;
   const selectedLang = $("language").value;
   if (selectedLang !== "auto") {
     apiMessages[apiMessages.length - 1].content += `\nPlease reply in ${({en:"English",hi:"Hindi",es:"Spanish",fr:"French"})[selectedLang]}.`;
@@ -325,6 +363,49 @@ function speak(text) {
   utterance.lang = speechLanguage(text);
   speechSynthesis.speak(utterance);
 }
+async function copyText(text, successMessage = "Copied to clipboard.") {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(String(text));
+  } else {
+    const temporary = document.createElement("textarea");
+    temporary.value = String(text);
+    temporary.style.position = "fixed";
+    temporary.style.opacity = "0";
+    document.body.appendChild(temporary);
+    temporary.select();
+    const copied = document.execCommand("copy");
+    temporary.remove();
+    if (!copied) throw new Error("Clipboard unavailable");
+  }
+  toast(successMessage);
+}
+function exportConversation() {
+  if (!messages.length) return toast("Start a conversation before exporting it.");
+  const title = String(messages.find(m => m.role === "user")?.content || "AETHER conversation").replace(/\s+/g, " ").slice(0, 64);
+  const content = [
+    `# ${title}`,
+    `Exported from AETHER AI on ${new Date().toLocaleString()}`,
+    "",
+    ...messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.content}`)
+  ].join("\n\n");
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${title.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "").slice(0, 48) || "aether-chat"}.md`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Conversation exported as Markdown.");
+}
+function setFocusMode(enabled) {
+  document.body.classList.toggle("focus-mode", enabled);
+  const button = $("focusModeToggle");
+  button.setAttribute("aria-pressed", String(enabled));
+  button.querySelector("span").textContent = enabled ? "Exit focus" : "Focus";
+  try { localStorage.setItem(FOCUS_MODE_STORAGE, enabled ? "1" : "0"); } catch { /* Optional preference. */ }
+}
 $("micButton").addEventListener("click", () => {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Recognition) return toast("Voice input is not supported in this browser. Try a compatible browser and allow microphone access.");
@@ -393,11 +474,28 @@ $("fileInput").addEventListener("change", async e => {
 $("language").addEventListener("change", e => {
   toast("Preferred reply language: " + e.target.options[e.target.selectedIndex].text);
 });
+const responseMode = $("responseMode");
+try {
+  const savedMode = localStorage.getItem(RESPONSE_MODE_STORAGE);
+  if (savedMode && RESPONSE_MODES[savedMode]) responseMode.value = savedMode;
+  if (localStorage.getItem(FOCUS_MODE_STORAGE) === "1") setFocusMode(true);
+} catch { /* Preferences remain usable for this page even when storage is disabled. */ }
+responseMode.addEventListener("change", e => {
+  try { localStorage.setItem(RESPONSE_MODE_STORAGE, e.target.value); } catch { /* Optional preference. */ }
+  toast(`Response style: ${e.target.options[e.target.selectedIndex].text}`);
+});
+$("focusModeToggle").addEventListener("click", () => setFocusMode(!document.body.classList.contains("focus-mode")));
+$("exportChat").addEventListener("click", exportConversation);
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
     e.preventDefault();
     $("globalSearch").focus();
   }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "e") {
+    e.preventDefault();
+    exportConversation();
+  }
+  if (e.key === "Escape" && document.body.classList.contains("focus-mode")) setFocusMode(false);
 });
 render();
 health();

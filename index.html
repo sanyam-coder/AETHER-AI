@@ -44,6 +44,8 @@
     <header class="topbar">
       <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
       <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search English Wikipedia or ask anything…" aria-label="Search English Wikipedia or ask AETHER AI"></div>
+      <button class="studio-action focus-action" id="focusModeToggle" type="button" aria-pressed="false" title="Hide side panels for focused reading">◫ <span>Focus</span></button>
+      <button class="studio-action export-action" id="exportChat" type="button" title="Download this conversation">⇩ <span>Export</span></button>
       <div class="top-controls">
         <span class="online-indicator"><i></i> Online <b>•</b> <span id="connectionLabel">Checking AI connection…</span></span>
         <label class="language-select" aria-label="Reply language">◎ <select id="language"><option value="auto">Auto language</option><option value="en">English</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option></select></label>
@@ -55,9 +57,10 @@
     <section class="workspace">
       <section class="center-panel">
         <div class="hero" id="hero">
-          <div class="cosmic-logo"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="big-a">A</div><span class="spark s1">✦</span><span class="spark s2">✧</span></div>
+          <div class="hero-kicker"><span class="hero-kicker-dot"></span> AETHER STUDIO <span class="hero-kicker-divider">/</span> INTELLIGENCE IN MOTION</div>
+          <div class="cosmic-logo"><div class="core-halo"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="big-a">A</div><span class="spark s1">✦</span><span class="spark s2">✧</span></div>
           <h1>AETHER <span>AI</span></h1>
-          <p class="hero-subtitle">Your intelligent companion for a smarter tomorrow.</p>
+          <p class="hero-subtitle">One space to think, create, and explore.</p>
 
           <div class="feature-grid">
             <button class="feature-card blue" data-mode="chat"><span class="feature-icon">☏</span><span><b>Chat</b><small>Ask questions and get AI replies.</small></span></button>
@@ -77,6 +80,7 @@
           <button data-prompt="Help me write clean, working code.">‹/› Write code</button>
           <button data-prompt="Write a detailed image-generation prompt for a futuristic city at night.">▧ Draft an image prompt</button>
           <button data-prompt="Search Wikipedia for artificial intelligence and summarize it.">⌕ Search Wikipedia</button>
+          <button data-prompt="Brainstorm ten original ideas, then rank them by usefulness and novelty.">✧ Brainstorm</button>
         </div>
 
         <div class="composer-wrap">
@@ -88,6 +92,15 @@
                 <label class="composer-icon" title="Attach a text file" aria-label="Attach a text file">♧<input type="file" id="fileInput" accept=".txt,.md,.csv,.json,.js,.html,.css,.xml,.log"></label>
                 <button type="button" class="composer-icon" id="imagePromptButton" title="Draft an image-generation prompt" aria-label="Draft an image-generation prompt">▧</button>
                 <button type="button" class="composer-icon" id="webSearchButton" title="Search English Wikipedia" aria-label="Search English Wikipedia">◎</button>
+                <label class="response-mode-label" for="responseMode">RESPONSE STYLE</label>
+                <select id="responseMode" class="response-mode" aria-label="AI response style">
+                  <option value="balanced">Balanced</option>
+                  <option value="quick">Quick</option>
+                  <option value="deep">Deep dive</option>
+                  <option value="tutor">Tutor</option>
+                  <option value="builder">Builder</option>
+                  <option value="creative">Creative</option>
+                </select>
                 <span class="composer-hint">Enter to send · Shift+Enter for new line</span>
               </div>
               <div class="composer-right">
