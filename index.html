@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#030b22">
+  <title>AETHER AI — Beyond intelligence</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#" aria-label="AETHER AI home">
+      <span class="brand-mark"><span>A</span></span>
+      <span class="brand-copy"><strong>AETHER <i>AI</i></strong><small>Beyond intelligence. Beyond limits.</small></span>
+    </a>
+
+    <button class="new-chat" id="newChat"><span>＋</span> New chat</button>
+    <nav class="nav-list" aria-label="Main navigation">
+      <button class="nav-item active" data-mode="chat"><span class="nav-icon">◉</span>Chat</button>
+      <button class="nav-item" data-mode="voice"><span class="nav-icon">♩</span>Voice Assistant</button>
+      <button class="nav-item" data-mode="search"><span class="nav-icon">⌕</span>Search the Web</button>
+      <button class="nav-item" data-mode="code"><span class="nav-icon">‹/›</span>Code &amp; Create</button>
+      <button class="nav-item" data-mode="images"><span class="nav-icon">▧</span>Generate Images</button>
+      <button class="nav-item" data-mode="files"><span class="nav-icon">⇧</span>Upload Files</button>
+      <button class="nav-item" data-mode="memory"><span class="nav-icon">◴</span>Memory</button>
+      <button class="nav-item" data-mode="settings"><span class="nav-icon">⚙</span>Settings</button>
+    </nav>
+
+    <div class="recent-heading"><span>◷</span> Recent Chats</div>
+    <div class="recent-list" id="recentList">
+      <button class="recent-item" data-prompt="Explain quantum computing in simple words."><span>▢</span>Explain quantum computing</button>
+      <button class="recent-item" data-prompt="Create a website for my business."><span>▢</span>Create a website for my business</button>
+      <button class="recent-item" data-prompt="What are some best coding practices?"><span>▢</span>Best coding practices</button>
+      <button class="recent-item" data-prompt="Explain how AI assistants work."><span>▢</span>How AI assistants work</button>
+    </div>
+    <div class="sidebar-footer">
+      <span class="pulse-dot"></span>
+      <div><strong>AETHER AI</strong><small>Free for everyone</small></div>
+      <span class="sound-wave">▂▅▇</span>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+      <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search the web, ask anything..." aria-label="Search or ask anything"><kbd>Ctrl K</kbd></div>
+      <div class="top-controls">
+        <span class="online-indicator"><i></i> Online <b>•</b> <span id="connectionLabel">AI ready to connect</span></span>
+        <label class="language-select" aria-label="Language">◎ <select id="language"><option value="auto">Auto language</option><option value="en">English</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option></select></label>
+        <button class="icon-button" id="topSpeak" title="Toggle spoken replies" aria-label="Toggle spoken replies">◖))</button>
+        <button class="profile-button" id="profileButton" title="Local demo profile">A</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <section class="center-panel">
+        <div class="hero" id="hero">
+          <div class="cosmic-logo"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="big-a">A</div><span class="spark s1">✦</span><span class="spark s2">✧</span></div>
+          <h1>AETHER <span>AI</span></h1>
+          <p class="hero-subtitle">Your intelligent companion for a smarter tomorrow.</p>
+
+          <div class="feature-grid">
+            <button class="feature-card blue" data-mode="chat"><span class="feature-icon">☏</span><span><b>Chat</b><small>Ask anything, get help instantly.</small></span></button>
+            <button class="feature-card violet" data-mode="voice"><span class="feature-icon">♩</span><span><b>Voice</b><small>Speak and listen naturally.</small></span></button>
+            <button class="feature-card teal" data-mode="search"><span class="feature-icon">⌕</span><span><b>Search</b><small>Find information from the web.</small></span></button>
+            <button class="feature-card purple" data-mode="code"><span class="feature-icon">‹/›</span><span><b>Code</b><small>Write, debug and explain code.</small></span></button>
+            <button class="feature-card pink" data-mode="images"><span class="feature-icon">▧</span><span><b>Images</b><small>Create image prompts from text.</small></span></button>
+            <button class="feature-card amber" data-mode="files"><span class="feature-icon">⇧</span><span><b>Files</b><small>Upload and analyze text files.</small></span></button>
+            <button class="feature-card cyan" data-mode="memory"><span class="feature-icon">◴</span><span><b>Memory</b><small>Keep chats on this device.</small></span></button>
+          </div>
+        </div>
+
+        <section class="chat-area" id="chatArea" aria-live="polite"></section>
+
+        <div class="prompt-chips" id="promptChips">
+          <button data-prompt="Explain something complex in simple words.">✦ Explain something</button>
+          <button data-prompt="Help me write clean, working code.">‹/› Write code</button>
+          <button data-prompt="Write a detailed image-generation prompt for a futuristic city at night.">▧ Create image prompt</button>
+          <button data-prompt="Search Wikipedia for artificial intelligence and summarize it.">⌕ Search the web</button>
+        </div>
+
+        <div class="composer-wrap">
+          <div class="file-attachment" id="fileAttachment"></div>
+          <form class="composer" id="chatForm">
+            <textarea id="messageInput" rows="1" placeholder="Type your message here..." aria-label="Type your message"></textarea>
+            <div class="composer-bottom">
+              <div class="composer-tools">
+                <label class="composer-icon" title="Attach a text file">♧<input type="file" id="fileInput" accept=".txt,.md,.csv,.json,.js,.html,.css,.xml,.log"></label>
+                <button type="button" class="composer-icon" id="imagePromptButton" title="Create an image prompt">▧</button>
+                <button type="button" class="composer-icon" id="webSearchButton" title="Search Wikipedia">◎</button>
+                <span class="composer-hint">Enter to send · Shift+Enter for new line</span>
+              </div>
+              <div class="composer-right">
+                <button type="button" class="mic-button" id="micButton" title="Voice input">♩</button>
+                <button type="submit" class="send-button" id="sendButton" title="Send message">➤</button>
+              </div>
+            </div>
+          </form>
+          <p class="footnote">AETHER AI is free for everyone. AI responses can make mistakes—verify important information.</p>
+        </div>
+      </section>
+
+      <aside class="right-panel">
+        <section class="promo-card">
+          <div class="promo-copy"><span class="eyebrow">YOUR IDEAS. OUR AI.</span><h2>Explore more<br>with <span>AETHER AI</span></h2><p>One assistant. Endless possibilities.</p><div class="promo-lines"><i></i><i></i><i></i></div></div>
+          <div class="moon-art"><div class="moon"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="mountain m3"></div></div>
+        </section>
+
+        <section class="side-card">
+          <h3><span class="heading-spark">ϟ</span> Quick Actions</h3>
+          <div class="quick-grid">
+            <button class="quick-action pink" data-mode="images"><span>▧</span><b>Generate Image</b><i>↗</i></button>
+            <button class="quick-action violet" data-mode="code"><span>‹/›</span><b>Write Code</b><i>↗</i></button>
+            <button class="quick-action teal" data-mode="search"><span>⌕</span><b>Search the Web</b><i>↗</i></button>
+            <button class="quick-action amber" data-mode="files"><span>⇧</span><b>Upload File</b><i>↗</i></button>
+          </div>
+        </section>
+
+        <section class="side-card popular-card">
+          <h3><span class="bulb">♟</span> Popular Prompts</h3>
+          <button class="popular-prompt" data-prompt="Create a modern website for my business.">Create a website for my business <span>›</span></button>
+          <button class="popular-prompt" data-prompt="Explain a complex topic in simple words.">Explain a complex topic simply <span>›</span></button>
+          <button class="popular-prompt" data-prompt="Give me a Python code example and explain it.">Give me a Python code example <span>›</span></button>
+          <button class="popular-prompt" data-prompt="Write a detailed prompt for an image of a beautiful sunset.">Generate an image of a sunset <span>›</span></button>
+          <button class="popular-prompt" data-prompt="Tell me how to summarize a document effectively.">Summarize this document <span>›</span></button>
+        </section>
+
+        <section class="side-card language-card">
+          <h3><span>◎</span> Supported Languages</h3>
+          <div class="language-list">
+            <button data-lang="en"><span>🇬🇧</span>English</button>
+            <button data-lang="hi"><span>🇮🇳</span>Hindi</button>
+            <button data-lang="es"><span>🇪🇸</span>Spanish</button>
+            <button data-lang="fr"><span>🇫🇷</span>French</button>
+            <button data-lang="auto"><span class="more-languages">＋</span>+ More</button>
+          </div>
+        </section>
+        <div class="free-note"><span>✦</span><div><b>Free for everyone</b><small>No upgrade prompts. Just create.</small></div></div>
+      </aside>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="/app.js"></script>
+</body>
+</html>
