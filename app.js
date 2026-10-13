@@ -92,6 +92,7 @@ function save() {
 function renderRecent() {
   const list = $("recentList");
   if (!list) return;
+  closeChatMenu();
   list.replaceChildren();
   const recent = threads.slice().sort((a, b) => b.updatedAt - a.updatedAt);
   if (!recent.length) {
@@ -102,6 +103,9 @@ function renderRecent() {
     return;
   }
   for (const thread of recent) {
+    const row = document.createElement("div");
+    row.className = "recent-row";
+    row.dataset.threadRowId = thread.id;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "recent-item" + (thread.id === activeThreadId ? " active" : "");
@@ -114,9 +118,88 @@ function renderRecent() {
     label.className = "recent-title";
     label.textContent = thread.title;
     button.append(icon, label);
-    list.appendChild(button);
+    const actions = document.createElement("button");
+    actions.type = "button";
+    actions.className = "recent-more";
+    actions.dataset.threadMenuId = thread.id;
+    actions.title = `Actions for ${thread.title}`;
+    actions.setAttribute("aria-label", `Actions for saved chat: ${thread.title}`);
+    actions.setAttribute("aria-haspopup", "menu");
+    actions.setAttribute("aria-controls", "chatContextMenu");
+    actions.setAttribute("aria-expanded", "false");
+    actions.textContent = "⋯";
+    row.append(button, actions);
+    list.appendChild(row);
   }
 }
+const chatContextMenu = $("chatContextMenu");
+let chatMenuTrigger = null;
+function closeChatMenu(restoreFocus = false) {
+  if (!chatContextMenu) return;
+  chatContextMenu.hidden = true;
+  delete chatContextMenu.dataset.chatThreadId;
+  const trigger = chatMenuTrigger;
+  chatMenuTrigger = null;
+  if (trigger) {
+    trigger.setAttribute("aria-expanded", "false");
+    if (restoreFocus && trigger.isConnected) trigger.focus();
+  }
+}
+function openChatMenu(threadId, x, y, trigger = null) {
+  closeChatMenu();
+  chatMenuTrigger = trigger;
+  if (trigger) trigger.setAttribute("aria-expanded", "true");
+  chatContextMenu.dataset.chatThreadId = threadId;
+  chatContextMenu.hidden = false;
+  const width = chatContextMenu.offsetWidth;
+  const height = chatContextMenu.offsetHeight;
+  chatContextMenu.style.left = `${Math.max(8, Math.min(x, window.innerWidth - width - 8))}px`;
+  chatContextMenu.style.top = `${Math.max(8, Math.min(y, window.innerHeight - height - 8))}px`;
+  chatContextMenu.querySelector('[data-chat-action="share"]').focus();
+}
+$("recentList").addEventListener("contextmenu", event => {
+  const row = event.target.closest("[data-thread-row-id]");
+  if (!row) return;
+  event.preventDefault();
+  openChatMenu(row.dataset.threadRowId, event.clientX, event.clientY, row.querySelector(".recent-more"));
+});
+$("recentList").addEventListener("click", event => {
+  const trigger = event.target.closest("[data-thread-menu-id]");
+  if (!trigger) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (!chatContextMenu.hidden && chatContextMenu.dataset.chatThreadId === trigger.dataset.threadMenuId) {
+    closeChatMenu(true);
+    return;
+  }
+  const rect = trigger.getBoundingClientRect();
+  openChatMenu(trigger.dataset.threadMenuId, rect.right, rect.bottom, trigger);
+});
+chatContextMenu.addEventListener("click", async event => {
+  const actionButton = event.target.closest("[data-chat-action]");
+  if (!actionButton) return;
+  const action = actionButton.dataset.chatAction;
+  const threadId = chatContextMenu.dataset.chatThreadId;
+  closeChatMenu();
+  if (action === "share") await shareSavedChat(threadId);
+  else if (action === "download") downloadSavedChat(threadId);
+  else if (action === "delete") deleteSavedChat(threadId);
+});
+chatContextMenu.addEventListener("keydown", event => {
+  const items = [...chatContextMenu.querySelectorAll("[role=menuitem]")];
+  const index = items.indexOf(document.activeElement);
+  if (event.key === "Escape") { event.preventDefault(); closeChatMenu(true); }
+  else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    const step = event.key === "ArrowDown" ? 1 : -1;
+    items[(index + step + items.length) % items.length]?.focus();
+  } else if (event.key === "Home") { event.preventDefault(); items[0]?.focus(); }
+  else if (event.key === "End") { event.preventDefault(); items.at(-1)?.focus(); }
+});
+document.addEventListener("pointerdown", event => {
+  if (!chatContextMenu.hidden && !chatContextMenu.contains(event.target) && !event.target.closest("[data-thread-menu-id]")) closeChatMenu();
+});
+window.addEventListener("resize", () => closeChatMenu());
 function esc(text) {
   return String(text).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 }
@@ -379,6 +462,99 @@ async function copyText(text, successMessage = "Copied to clipboard.") {
   }
   toast(successMessage);
 }
+function savedThreadMarkdown(thread) {
+  const title = String(thread.title || "AETHER conversation").replace(/\s+/g, " ").slice(0, 64);
+  return [
+    `# ${title}`,
+    `Exported from AETHER AI on ${new Date().toLocaleString()}`,
+    "",
+    ...thread.messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.content}`)
+  ].join("\n\n");
+}
+function downloadSavedChat(threadId) {
+  const thread = threads.find(item => item.id === threadId);
+  if (!thread) return toast("That saved chat could not be found.");
+  if (!thread.messages.length) return toast("This saved chat has no messages to download.");
+  const title = String(thread.title || "AETHER conversation");
+  const blob = new Blob([savedThreadMarkdown(thread)], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${title.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "").slice(0, 48) || "aether-chat"}.md`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Saved chat downloaded as Markdown.");
+}
+async function shareSavedChat(threadId) {
+  const thread = threads.find(item => item.id === threadId);
+  if (!thread) return toast("That saved chat could not be found.");
+  if (!thread.messages.length) return toast("This saved chat has no messages to share.");
+  const transcript = savedThreadMarkdown(thread);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: `${thread.title || "AETHER conversation"} — AETHER AI`, text: transcript });
+      toast("Saved chat shared.");
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+  try {
+    await copyText(transcript, navigator.share ? "Share sheet unavailable; chat transcript copied." : "Chat transcript copied for sharing.");
+  } catch { toast("Could not share this chat in this browser."); }
+}
+function deleteSavedChat(threadId) {
+  const thread = threads.find(item => item.id === threadId);
+  if (!thread) return toast("That saved chat could not be found.");
+  if (busy && thread.id === activeThreadId) return toast("Wait for the current reply to finish before deleting this chat.");
+  if (!window.confirm(`Delete “${thread.title}” from saved chats on this device? This cannot be undone.`)) return;
+  threads = threads.filter(item => item.id !== threadId);
+  const deletedActive = activeThreadId === threadId;
+  if (deletedActive) {
+    activeThreadId = null;
+    messages = [];
+    fileContext = "";
+    fileName = "";
+    fileAttachment.textContent = "";
+    messageInput.value = "";
+    messageInput.style.height = "auto";
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+  }
+  let storageFailed = false;
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify(threads));
+    if (deletedActive) localStorage.removeItem(ACTIVE_STORAGE);
+    localStorage.removeItem(LEGACY_STORAGE);
+  }
+  catch { storageFailed = true; }
+  render();
+  toast(storageFailed ? "The chat was removed for this session, but browser storage could not be updated." : "Saved chat deleted. Other chats are unchanged.");
+}
+function clearCurrentChat() {
+  if (busy) return toast("Wait for the current reply to finish before clearing this chat.");
+  if (!messages.length && !fileContext && !messageInput.value.trim()) return toast("This chat is already empty.");
+  if (!window.confirm("Clear this conversation and its unsent draft? The active chat will be removed from Saved chats on this device; other saved chats will remain.")) return;
+  if (activeThreadId) threads = threads.filter(item => item.id !== activeThreadId);
+  activeThreadId = null;
+  messages = [];
+  fileContext = "";
+  fileName = "";
+  fileAttachment.textContent = "";
+  messageInput.value = "";
+  messageInput.style.height = "auto";
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  let storageFailed = false;
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify(threads));
+    localStorage.removeItem(ACTIVE_STORAGE);
+    localStorage.removeItem(LEGACY_STORAGE);
+  }
+  catch { storageFailed = true; }
+  render();
+  toast(storageFailed ? "The chat was cleared for this session, but browser storage could not be updated." : "Current chat cleared. Other saved chats are unchanged.");
+}
 function exportConversation() {
   if (!messages.length) return toast("Start a conversation before exporting it.");
   const title = String(messages.find(m => m.role === "user")?.content || "AETHER conversation").replace(/\s+/g, " ").slice(0, 64);
@@ -486,6 +662,7 @@ responseMode.addEventListener("change", e => {
 });
 $("focusModeToggle").addEventListener("click", () => setFocusMode(!document.body.classList.contains("focus-mode")));
 $("exportChat").addEventListener("click", exportConversation);
+$("clearChat").addEventListener("click", clearCurrentChat);
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
     e.preventDefault();

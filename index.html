@@ -47,6 +47,7 @@
       <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search English Wikipedia or ask anything…" aria-label="Search English Wikipedia or ask AETHER AI"></div>
       <button class="studio-action focus-action" id="focusModeToggle" type="button" aria-pressed="false" title="Hide side panels for focused reading">◫ <span>Focus</span></button>
       <button class="studio-action" id="openToolbox" type="button" title="Open built-in tools">⊞ <span>Tools</span></button>
+      <button class="studio-action clear-action" id="clearChat" type="button" title="Clear the current conversation" aria-label="Clear current chat">⌫ <span>Clear Chat</span></button>
       <button class="studio-action export-action" id="exportChat" type="button" title="Download this conversation">⇩ <span>Export</span></button>
       <div class="top-controls">
         <span class="online-indicator"><i></i> Online <b>•</b> <span id="connectionLabel">Checking AI connection…</span></span>
@@ -209,8 +210,14 @@
         </section>
       </div>
     </div>
-  </div>
+</div>
 </dialog>
+<div class="chat-context-menu" id="chatContextMenu" role="menu" aria-label="Saved chat actions" hidden>
+  <button type="button" role="menuitem" data-chat-action="share"><span>↗</span> Share</button>
+  <button type="button" role="menuitem" data-chat-action="download"><span>⇩</span> Download</button>
+  <div class="chat-menu-divider" aria-hidden="true"></div>
+  <button type="button" role="menuitem" class="delete-chat-action" data-chat-action="delete"><span>⌫</span> Delete</button>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/app.js" defer></script>
 </body>

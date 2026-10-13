@@ -678,3 +678,19 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
  .hero-subtitle{margin:0 0 3px}
  .chat-area{min-height:220px}
 }
+
+/* Saved-chat actions and the current-chat clear control. */
+.recent-row{display:flex;align-items:center;gap:2px;min-width:0;border-radius:8px}
+.recent-row .recent-item{width:auto;min-width:0;flex:1;padding-right:5px}
+.recent-more{width:28px;height:28px;flex:0 0 28px;display:grid;place-items:center;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);font-size:18px;line-height:1;opacity:0;transition:opacity .14s,background .14s,border-color .14s}
+.recent-row:hover .recent-more,.recent-row:focus-within .recent-more,.recent-more[aria-expanded=true]{opacity:1}
+.recent-more:hover{border-color:var(--line);background:var(--surface-raised);color:var(--accent-strong)}
+.chat-context-menu{position:fixed;z-index:1000;min-width:184px;padding:6px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--text);box-shadow:0 16px 44px rgba(34,31,73,.2)}
+.chat-context-menu[hidden]{display:none}
+.chat-context-menu button{width:100%;min-height:36px;display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);text-align:left;font-size:12px}
+.chat-context-menu button:hover,.chat-context-menu button:focus-visible{border-color:var(--line);background:var(--surface-soft);color:var(--accent-strong)}
+.chat-context-menu button>span{width:18px;color:var(--accent-strong);text-align:center;font-size:14px}
+.chat-menu-divider{height:1px;margin:5px 3px;background:var(--line)}
+.clear-action{color:var(--muted)}
+@media(hover:none){.recent-more{opacity:1}}
+@media(max-width:960px){.studio-action{width:32px;min-width:32px;justify-content:center;padding:0}.studio-action span{display:none}}

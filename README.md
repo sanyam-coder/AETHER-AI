@@ -30,6 +30,7 @@ Keep `.env` private; never commit an API key. On Render, set `GROQ_API_KEY` (and
 - Text/code file reading: TXT, MD, CSV, JSON, JS, HTML, CSS, XML, LOG; 2 MB upload cap and at most 30,000 characters sent with a chat request
 - Toolbox utilities: arithmetic calculator with a safe parser, unit conversion (length, mass, temperature, digital storage, time), and a local Text Lab (counts, case/spacing cleanup, duplicate-line removal, JSON formatting, copy, and send-to-chat)
 - The calculator, converter, and Text Lab run locally in the browser; their contents are not uploaded unless the user explicitly sends text to chat
+- Saved chats have a right-click or ⋯ menu for Share (native share sheet, with clipboard fallback), Markdown Download, and confirmed Delete; Clear removes the current conversation and unsent draft after confirmation while preserving other saved chats
 - Code assistance and image-prompt drafting through chat; image files are not generated
 
 ## Important limitations and privacy
@@ -39,6 +40,8 @@ This is a small public demo, not a complete production service. There is no sign
 Chat prompts and any attached text included in a question are sent from this server to Groq to generate a reply. Do not submit passwords, secrets, or sensitive personal information. Search queries go to the English Wikipedia API. Voice input/output uses the browser's speech features.
 
 Response-style instructions are added to the prompt sent to Groq. Chat export is generated locally in the browser and downloads a Markdown file. Focus mode and response style are saved only in the current browser profile. The Toolbox calculator, converter, and Text Lab process content in the current browser tab; use “Send to chat” only when you want text submitted to Groq.
+
+Saved chat history remains in this browser only. Share acts only after the user selects it and uses the browser’s share sheet when available, otherwise it copies the transcript. Clear and Delete ask for confirmation and affect only the selected/current chat; other saved conversations are kept.
 
 The built-in API throttles are per-process and reset when the server restarts; for multiple instances, use a shared rate-limit store. Public deployment should also use an approved provider budget/usage limit and monitor logs. This repository does not include a general web-search provider, image-generation service, authentication, or cloud database; those require separately selected services/credentials and configuration. Render's free instance may sleep when idle, so its first response can be delayed.
 
