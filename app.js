@@ -205,7 +205,7 @@ function render() {
   if (!messages.length) {
     const welcome = document.createElement("div");
     welcome.className = "welcome-message";
-    welcome.innerHTML = `<div class="assistant-avatar">A</div><div class="message-bubble"><div class="message-name">AETHER AI</div><p>Hello! I’m <strong style="color:#48e6ff">AETHER AI</strong>.</p><p>I can chat, help with code, search English Wikipedia, and analyze supported text files. I can draft image prompts but cannot generate image files yet.</p><p>How can I help you today?</p></div>`;
+    welcome.innerHTML = `<div class="assistant-avatar">A</div><div class="message-bubble"><div class="message-name">AETHER AI</div><p>Hello! I’m <strong style="color:#48e6ff">AETHER AI</strong>.</p><p>I can chat, help with code, search English Wikipedia, and analyze supported text files. Open Toolbox for private browser-local calculations, unit conversion, and text tools. Image prompts are supported; image generation is not connected yet.</p><p>How can I help you today?</p></div>`;
     chatArea.appendChild(welcome);
   } else messages.slice(-MAX_MESSAGES).forEach(drawMessage);
   chatArea.scrollTop = chatArea.scrollHeight;
@@ -499,3 +499,214 @@ document.addEventListener("keydown", e => {
 });
 render();
 health();
+
+
+// Built-in Toolbox: local utilities run entirely in the browser.
+function openToolbox() {
+  const dialog = $("toolboxDialog");
+  if (dialog && !dialog.open) dialog.showModal();
+}
+function selectToolTab(name) {
+  document.querySelectorAll("[data-tool-tab]").forEach(tab => {
+    const selected = tab.dataset.toolTab === name;
+    tab.setAttribute("aria-selected", String(selected));
+  });
+  document.querySelectorAll("[data-tool-panel]").forEach(panel => {
+    panel.hidden = panel.dataset.toolPanel !== name;
+  });
+}
+function evaluateToolExpression(source) {
+  source = String(source || "").trim();
+  if (!source || source.length > 180) throw new Error("Enter an expression under 180 characters.");
+  const tokens = [];
+  let offset = 0;
+  while (offset < source.length) {
+    if (/\s/.test(source[offset])) { offset++; continue; }
+    const match = /^(?:(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[a-z]+|[()+\-*/%^,])/i.exec(source.slice(offset));
+    if (!match) throw new Error("Use numbers, arithmetic operators, parentheses, and supported functions only.");
+    tokens.push(match[0]);
+    offset += match[0].length;
+  }
+  let cursor = 0;
+  const peek = () => tokens[cursor];
+  const take = () => tokens[cursor++];
+  const expect = value => { if (take() !== value) throw new Error(`Expected “${value}”.`); };
+  const parseExpression = () => {
+    let value = parseTerm();
+    while (peek() === "+" || peek() === "-") {
+      const op = take(), rhs = parseTerm();
+      value = op === "+" ? value + rhs : value - rhs;
+    }
+    return value;
+  };
+  const parseTerm = () => {
+    let value = parseUnary();
+    while (["*", "/", "%"].includes(peek())) {
+      const op = take(), rhs = parseUnary();
+      if ((op === "/" || op === "%") && rhs === 0) throw new Error("Cannot divide by zero.");
+      value = op === "*" ? value * rhs : op === "/" ? value / rhs : value % rhs;
+    }
+    return value;
+  };
+  const parseUnary = () => {
+    if (peek() === "+") { take(); return parseUnary(); }
+    if (peek() === "-") { take(); return -parseUnary(); }
+    return parsePower();
+  };
+  const parsePower = () => {
+    const value = parsePrimary();
+    if (peek() === "^") { take(); return value ** parseUnary(); }
+    return value;
+  };
+  const parsePrimary = () => {
+    const token = take();
+    if (token === undefined) throw new Error("Expression is incomplete.");
+    if (/^(?:\d|\.)/.test(token)) return Number(token);
+    if (token === "(") {
+      const value = parseExpression();
+      expect(")");
+      return value;
+    }
+    if (/^[a-z]+$/i.test(token)) {
+      const functions = {
+        sqrt: values => { if (values.length !== 1 || values[0] < 0) throw new Error("sqrt needs one non-negative value."); return Math.sqrt(values[0]); },
+        abs: values => { if (values.length !== 1) throw new Error("abs needs one value."); return Math.abs(values[0]); },
+        floor: values => { if (values.length !== 1) throw new Error("floor needs one value."); return Math.floor(values[0]); },
+        ceil: values => { if (values.length !== 1) throw new Error("ceil needs one value."); return Math.ceil(values[0]); },
+        round: values => { if (values.length !== 1) throw new Error("round needs one value."); return Math.round(values[0]); },
+        min: values => { if (!values.length) throw new Error("min needs at least one value."); return Math.min(...values); },
+        max: values => { if (!values.length) throw new Error("max needs at least one value."); return Math.max(...values); }
+      };
+      const fn = functions[token.toLowerCase()];
+      if (!fn) throw new Error(`Unsupported function: ${token}.`);
+      expect("(");
+      const args = [];
+      if (peek() !== ")") {
+        args.push(parseExpression());
+        while (peek() === ",") { take(); args.push(parseExpression()); }
+      }
+      expect(")");
+      return fn(args);
+    }
+    throw new Error("Expression is incomplete or invalid.");
+  };
+  const result = parseExpression();
+  if (cursor !== tokens.length) throw new Error("Check the expression near the end.");
+  if (!Number.isFinite(result)) throw new Error("The result is outside the supported numeric range.");
+  return result;
+}
+const TOOL_UNITS = {
+  length: [{ id:"m", name:"meters", factor:1 }, { id:"km", name:"kilometers", factor:1000 }, { id:"cm", name:"centimeters", factor:.01 }, { id:"mi", name:"miles", factor:1609.344 }, { id:"ft", name:"feet", factor:.3048 }],
+  mass: [{ id:"kg", name:"kilograms", factor:1 }, { id:"g", name:"grams", factor:.001 }, { id:"lb", name:"pounds", factor:.45359237 }, { id:"oz", name:"ounces", factor:.028349523125 }],
+  temperature: [{ id:"c", name:"Celsius" }, { id:"f", name:"Fahrenheit" }, { id:"k", name:"Kelvin" }],
+  data: [{ id:"b", name:"bytes", factor:1 }, { id:"kb", name:"kilobytes", factor:1000 }, { id:"mb", name:"megabytes", factor:1000000 }, { id:"gb", name:"gigabytes", factor:1000000000 }],
+  time: [{ id:"s", name:"seconds", factor:1 }, { id:"min", name:"minutes", factor:60 }, { id:"h", name:"hours", factor:3600 }, { id:"day", name:"days", factor:86400 }]
+};
+function buildUnitOptions() {
+  const category = $("unitCategory").value;
+  const units = TOOL_UNITS[category];
+  for (const select of [$("unitFrom"), $("unitTo")]) {
+    select.replaceChildren(...units.map(unit => {
+      const option = document.createElement("option");
+      option.value = unit.id;
+      option.textContent = unit.name;
+      return option;
+    }));
+  }
+  const defaults = { length:["km","mi"], mass:["kg","lb"], temperature:["c","f"], data:["mb","gb"], time:["h","min"] }[category];
+  $("unitFrom").value = defaults[0];
+  $("unitTo").value = defaults[1];
+  convertUnits();
+}
+function convertUnits() {
+  const category = $("unitCategory").value;
+  const amount = Number($("unitAmount").value);
+  const from = TOOL_UNITS[category].find(unit => unit.id === $("unitFrom").value);
+  const to = TOOL_UNITS[category].find(unit => unit.id === $("unitTo").value);
+  if (!Number.isFinite(amount) || !from || !to) { $("convertResult").textContent = "Enter a valid number to convert."; return; }
+  let result;
+  if (category === "temperature") {
+    if (from.id === "k" && amount < 0) { $("convertResult").textContent = "Kelvin cannot be below absolute zero."; return; }
+    const celsius = from.id === "f" ? (amount - 32) * 5 / 9 : from.id === "k" ? amount - 273.15 : amount;
+    result = to.id === "f" ? celsius * 9 / 5 + 32 : to.id === "k" ? celsius + 273.15 : celsius;
+  } else result = amount * from.factor / to.factor;
+  if (!Number.isFinite(result)) { $("convertResult").textContent = "The result is outside the supported range."; return; }
+  const shown = Number(result.toPrecision(10)).toLocaleString(undefined, { maximumSignificantDigits: 10 });
+  const inputShown = Number(amount.toPrecision(10)).toLocaleString(undefined, { maximumSignificantDigits: 10 });
+  $("convertResult").textContent = `${inputShown} ${from.name} = ${shown} ${to.name}`;
+}
+function updateTextLabStats() {
+  const value = $("textLabInput").value;
+  const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+  $("textLabWords").textContent = `${words} ${words === 1 ? "word" : "words"}`;
+  $("textLabChars").textContent = `${value.length} ${value.length === 1 ? "character" : "characters"}`;
+  const lines = value ? value.split(/\r\n|\r|\n/).length : 0;
+  $("textLabLines").textContent = `${lines} ${lines === 1 ? "line" : "lines"}`;
+}
+function launchExistingTool(action) {
+  $("toolboxDialog").close();
+  if (action === "chat") { messageInput.focus(); return; }
+  if (action === "speech") { $("topSpeak").click(); return; }
+  if (action === "focus") { $("focusModeToggle").click(); return; }
+  if (action === "export") { $("exportChat").click(); return; }
+  chooseMode(action === "search" ? "search" : action === "files" ? "files" : action === "voice" ? "voice" : action === "images" ? "images" : "code");
+}
+
+$("openToolbox").addEventListener("click", openToolbox);
+$("closeToolbox").addEventListener("click", () => $("toolboxDialog").close());
+$("toolboxDialog").addEventListener("click", event => { if (event.target === $("toolboxDialog")) $("toolboxDialog").close(); });
+document.querySelectorAll('[data-mode="tools"]').forEach(button => button.addEventListener("click", openToolbox));
+document.querySelectorAll("[data-tool-tab]").forEach(button => button.addEventListener("click", () => selectToolTab(button.dataset.toolTab)));
+document.querySelectorAll("[data-calc-example]").forEach(button => button.addEventListener("click", () => {
+  $("calcExpression").value = button.dataset.calcExample;
+  $("calculateButton").click();
+}));
+function runToolCalculation() {
+  try {
+    const result = evaluateToolExpression($("calcExpression").value);
+    $("calcResult").textContent = `Result: ${Number(result.toPrecision(12)).toLocaleString(undefined, { maximumSignificantDigits: 12 })}`;
+  } catch (error) { $("calcResult").textContent = error.message; }
+}
+$("calculateButton").addEventListener("click", runToolCalculation);
+$("calcExpression").addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); runToolCalculation(); } });
+$("unitCategory").addEventListener("change", buildUnitOptions);
+$("unitAmount").addEventListener("input", convertUnits);
+$("unitFrom").addEventListener("change", convertUnits);
+$("unitTo").addEventListener("change", convertUnits);
+$("convertButton").addEventListener("click", convertUnits);
+$("textLabInput").addEventListener("input", updateTextLabStats);
+document.addEventListener("click", async event => {
+  const textAction = event.target.closest("[data-text-action]");
+  if (textAction) {
+    const field = $("textLabInput");
+    const action = textAction.dataset.textAction;
+    if (action === "uppercase") field.value = field.value.toLocaleUpperCase();
+    else if (action === "lowercase") field.value = field.value.toLocaleLowerCase();
+    else if (action === "clean") field.value = field.value.split(/\r\n|\r|\n/).map(line => line.replace(/[\t ]+/g, " ").trim()).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    else if (action === "dedupe") field.value = [...new Set(field.value.split(/\r\n|\r|\n/))].join("\n");
+    else if (action === "json") {
+      try { field.value = JSON.stringify(JSON.parse(field.value), null, 2); }
+      catch { toast("That text is not valid JSON."); return; }
+    } else if (action === "copy") {
+      if (!field.value) { toast("Add some text first."); return; }
+      try { await copyText(field.value, "Text copied."); } catch { toast("Could not copy text in this browser."); }
+      return;
+    } else if (action === "insert") {
+      if (!field.value.trim()) { toast("Add some text first."); return; }
+      messageInput.value = field.value;
+      $("toolboxDialog").close();
+      messageInput.focus();
+      toast("Text added to the chat composer.");
+      return;
+    }
+    updateTextLabStats();
+    field.focus();
+    return;
+  }
+  const calculatorExample = event.target.closest("[data-calc-example]");
+  if (calculatorExample) return;
+  const aiAction = event.target.closest("[data-tool-action]");
+  if (aiAction) launchExistingTool(aiAction.dataset.toolAction);
+});
+buildUnitOptions();
+updateTextLabStats();

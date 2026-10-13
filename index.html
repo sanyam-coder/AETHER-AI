@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f4fa">
-  <meta name="description" content="AETHER AI is a browser-based AI chat demo with code help, English Wikipedia search, local chat history, browser voice features, and text-file analysis.">
+  <meta name="description" content="AETHER AI is a browser-based AI workspace with chat, voice, code help, English Wikipedia search, text-file analysis, and local calculator, unit-converter, and text tools.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AETHER AI — Beyond intelligence">
-  <meta property="og:description" content="Chat with AETHER AI, explore code, search English Wikipedia, and analyze supported text files.">
+  <meta property="og:description" content="Chat with AETHER AI, explore code, search Wikipedia, analyze text files, and use built-in local productivity tools.">
   <title>AETHER AI — Beyond intelligence</title>
   <link rel="stylesheet" href="/style.css">
 </head>
@@ -25,6 +25,7 @@
       <button class="nav-item" data-mode="voice"><span class="nav-icon">♩</span>Voice input</button>
       <button class="nav-item" data-mode="search"><span class="nav-icon">⌕</span>Search Wikipedia</button>
       <button class="nav-item" data-mode="code"><span class="nav-icon">‹/›</span>Code &amp; Create</button>
+      <button class="nav-item" data-mode="tools" aria-label="Open Toolbox"><span class="nav-icon">⊞</span>Toolbox</button>
       <button class="nav-item" data-mode="images"><span class="nav-icon">▧</span>Image prompts</button>
       <button class="nav-item" data-mode="files"><span class="nav-icon">⇧</span>Upload Files</button>
       <button class="nav-item" data-mode="memory"><span class="nav-icon">◴</span>Local chat history</button>
@@ -45,6 +46,7 @@
       <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
       <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search English Wikipedia or ask anything…" aria-label="Search English Wikipedia or ask AETHER AI"></div>
       <button class="studio-action focus-action" id="focusModeToggle" type="button" aria-pressed="false" title="Hide side panels for focused reading">◫ <span>Focus</span></button>
+      <button class="studio-action" id="openToolbox" type="button" title="Open built-in tools">⊞ <span>Tools</span></button>
       <button class="studio-action export-action" id="exportChat" type="button" title="Download this conversation">⇩ <span>Export</span></button>
       <div class="top-controls">
         <span class="online-indicator"><i></i> Online <b>•</b> <span id="connectionLabel">Checking AI connection…</span></span>
@@ -60,7 +62,7 @@
           <div class="hero-kicker"><span class="hero-kicker-dot"></span> AETHER STUDIO <span class="hero-kicker-divider">/</span> INTELLIGENCE IN MOTION</div>
           <div class="cosmic-logo"><div class="core-halo"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="big-a">A</div><span class="spark s1">✦</span><span class="spark s2">✧</span></div>
           <h1>AETHER <span>AI</span></h1>
-          <p class="hero-subtitle">One space to think, create, and explore.</p>
+          <p class="hero-subtitle">Your command center for thinking, creating, and getting things done.</p>
 
           <div class="feature-grid">
             <button class="feature-card blue" data-mode="chat"><span class="feature-icon">☏</span><span><b>Chat</b><small>Ask questions and get AI replies.</small></span></button>
@@ -70,6 +72,7 @@
             <button class="feature-card pink" data-mode="images"><span class="feature-icon">▧</span><span><b>Image prompts</b><small>Draft prompts; image output is not connected.</small></span></button>
             <button class="feature-card amber" data-mode="files"><span class="feature-icon">⇧</span><span><b>Text files</b><small>Analyze supported text/code files.</small></span></button>
             <button class="feature-card cyan" data-mode="memory"><span class="feature-icon">◴</span><span><b>Local history</b><small>Saved only in this browser.</small></span></button>
+            <button class="feature-card violet" data-mode="tools"><span class="feature-icon">⊞</span><span><b>Toolbox</b><small>Calculator, conversions, and text lab.</small></span></button>
           </div>
         </div>
 
@@ -115,13 +118,14 @@
 
       <aside class="right-panel">
         <section class="promo-card">
-          <div class="promo-copy"><span class="eyebrow">YOUR IDEAS. OUR AI.</span><h2>Explore more<br>with <span>AETHER AI</span></h2><p>One assistant. Endless possibilities.</p><div class="promo-lines"><i></i><i></i><i></i></div></div>
+          <div class="promo-copy"><span class="eyebrow">AETHER WORKSPACE · LIVE</span><h2>One workspace.<br><span>More ways to work.</span></h2><p>AI assistance plus useful tools that run locally.</p><div class="promo-lines"><i></i><i></i><i></i></div></div>
           <div class="moon-art"><div class="moon"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="mountain m3"></div></div>
         </section>
 
         <section class="side-card">
           <h3><span class="heading-spark">ϟ</span> Quick Actions</h3>
           <div class="quick-grid">
+            <button class="quick-action cyan" data-mode="tools"><span>⊞</span><b>Open Toolbox</b><i>↗</i></button>
             <button class="quick-action pink" data-mode="images"><span>▧</span><b>Draft Image Prompt</b><i>↗</i></button>
             <button class="quick-action violet" data-mode="code"><span>‹/›</span><b>Write Code</b><i>↗</i></button>
             <button class="quick-action teal" data-mode="search"><span>⌕</span><b>Search Wikipedia</b><i>↗</i></button>
@@ -153,6 +157,60 @@
     </section>
   </main>
 </div>
+<dialog class="toolbox-dialog" id="toolboxDialog" aria-labelledby="toolboxTitle">
+  <div class="toolbox-window">
+    <header class="toolbox-header">
+      <div class="toolbox-heading"><span class="toolbox-mark">⊞</span><div><p> AETHER STUDIO · BUILT-IN TOOLS</p><h2 id="toolboxTitle">Toolbox</h2></div></div>
+      <div class="toolbox-header-actions"><span class="local-tool-badge">Runs in your browser</span><button class="toolbox-close" id="closeToolbox" type="button" aria-label="Close Toolbox">×</button></div>
+    </header>
+    <div class="toolbox-layout">
+      <nav class="toolbox-tabs" role="tablist" aria-label="Tool categories">
+        <button type="button" role="tab" id="toolTabCalculator" aria-controls="toolPanelCalculator" data-tool-tab="calculator" aria-selected="true">⌗ <span>Calculator</span></button>
+        <button type="button" role="tab" id="toolTabConverter" aria-controls="toolPanelConverter" data-tool-tab="converter" aria-selected="false">⇄ <span>Unit converter</span></button>
+        <button type="button" role="tab" id="toolTabTextLab" aria-controls="toolPanelTextLab" data-tool-tab="textlab" aria-selected="false">¶ <span>Text Lab</span></button>
+        <button type="button" role="tab" id="toolTabAI" aria-controls="toolPanelAI" data-tool-tab="ai" aria-selected="false">✦ <span>AI tools</span></button>
+      </nav>
+      <div class="toolbox-content">
+        <section class="tool-panel" id="toolPanelCalculator" data-tool-panel="calculator" role="tabpanel" aria-labelledby="toolTabCalculator">
+          <div class="tool-panel-intro"><span class="tool-eyebrow">LOCAL · PRIVATE</span><h3>Smart calculator</h3><p>Evaluate arithmetic directly in this browser—nothing is sent to the AI.</p></div>
+          <label class="tool-label" for="calcExpression">Expression</label>
+          <div class="tool-input-row"><input id="calcExpression" type="text" inputmode="text" autocomplete="off" placeholder="Try: sqrt(144) + 8 * 3"><button class="tool-primary" id="calculateButton" type="button">Calculate</button></div>
+          <output class="tool-result" id="calcResult" aria-live="polite">Enter an expression to begin.</output>
+          <p class="tool-hint">Supports + − × ÷, remainder (%), powers, parentheses, and sqrt, abs, round, floor, ceil, min, max.</p>
+          <div class="tool-examples"><span>Try</span><button type="button" data-calc-example="(1250 * 1.18) - 200">Tax + discount</button><button type="button" data-calc-example="sqrt(2025)">Square root</button><button type="button" data-calc-example="2^10">Power</button></div>
+        </section>
+        <section class="tool-panel" id="toolPanelConverter" data-tool-panel="converter" role="tabpanel" aria-labelledby="toolTabConverter" hidden>
+          <div class="tool-panel-intro"><span class="tool-eyebrow">LOCAL · PRIVATE</span><h3>Unit converter</h3><p>Convert common measurements instantly without leaving your workspace.</p></div>
+          <label class="tool-label" for="unitCategory">Category</label><select class="tool-select" id="unitCategory"><option value="length">Length</option><option value="mass">Mass</option><option value="temperature">Temperature</option><option value="data">Digital storage</option><option value="time">Time</option></select>
+          <label class="tool-label" for="unitAmount">Value</label><input class="tool-input" id="unitAmount" type="number" step="any" value="1">
+          <div class="tool-convert-grid"><label class="tool-field"><span>From</span><select class="tool-select" id="unitFrom"></select></label><span class="convert-arrow">→</span><label class="tool-field"><span>To</span><select class="tool-select" id="unitTo"></select></label></div>
+          <button class="tool-primary" id="convertButton" type="button">Convert</button><output class="tool-result" id="convertResult" aria-live="polite">1 kilometer = 0.621371 miles</output>
+        </section>
+        <section class="tool-panel" id="toolPanelTextLab" data-tool-panel="textlab" role="tabpanel" aria-labelledby="toolTabTextLab" hidden>
+          <div class="tool-panel-intro"><span class="tool-eyebrow">LOCAL · PRIVATE</span><h3>Text Lab</h3><p>Clean, inspect, and prepare text locally before using it in chat.</p></div>
+          <label class="tool-label" for="textLabInput">Your text</label><textarea class="tool-textarea" id="textLabInput" rows="8" placeholder="Paste text here to inspect or transform it…"></textarea>
+          <div class="text-stats"><span id="textLabWords">0 words</span><span id="textLabChars">0 characters</span><span id="textLabLines">0 lines</span></div>
+          <div class="text-actions"><button type="button" data-text-action="uppercase">UPPERCASE</button><button type="button" data-text-action="lowercase">lowercase</button><button type="button" data-text-action="clean">Clean spacing</button><button type="button" data-text-action="dedupe">Remove duplicate lines</button><button type="button" data-text-action="json">Format JSON</button><button type="button" data-text-action="copy">Copy</button><button type="button" data-text-action="insert">Send to chat</button></div>
+        </section>
+        <section class="tool-panel" id="toolPanelAI" data-tool-panel="ai" role="tabpanel" aria-labelledby="toolTabAI" hidden>
+          <div class="tool-panel-intro"><span class="tool-eyebrow">AETHER CAPABILITIES</span><h3>AI tools</h3><p>Launch the existing assistant features from one place.</p></div>
+          <div class="tool-launch-grid">
+            <button type="button" data-tool-action="chat"><b>◉ Ask AETHER</b><span>Reasoning, drafting, explanations</span></button>
+            <button type="button" data-tool-action="code"><b>‹/› Code Studio</b><span>Write, debug, and explain code</span></button>
+            <button type="button" data-tool-action="search"><b>⌕ Wikipedia Search</b><span>Search English Wikipedia</span></button>
+            <button type="button" data-tool-action="files"><b>⇧ File Analysis</b><span>Analyze supported text and code files</span></button>
+            <button type="button" data-tool-action="voice"><b>♩ Voice Input</b><span>Dictate in supported browsers</span></button>
+            <button type="button" data-tool-action="speech"><b>◖)) Spoken Replies</b><span>Read AETHER responses aloud</span></button>
+            <button type="button" data-tool-action="images"><b>▧ Prompt Studio</b><span>Draft image prompts; no image generation</span></button>
+            <button type="button" data-tool-action="focus"><b>◫ Focus Workspace</b><span>Hide side panels while reading</span></button>
+            <button type="button" data-tool-action="export"><b>⇩ Export Conversation</b><span>Download this chat as Markdown</span></button>
+          </div>
+          <p class="tool-hint">AI replies use the configured Groq model. Image generation and broad web search are not connected.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/app.js" defer></script>
 </body>

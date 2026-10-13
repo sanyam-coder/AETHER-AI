@@ -620,3 +620,61 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
 }
 
 .composer-icon svg { width: 17px; height: 17px; display: block; stroke: currentColor; }
+
+/* AETHER Toolbox workspace: layout-only additions using the existing theme tokens. */
+.toolbox-dialog{width:min(920px,calc(100vw - 40px));max-height:min(82vh,780px);padding:0;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.toolbox-dialog::backdrop{background:rgba(10,14,21,.62);backdrop-filter:blur(6px)}
+.toolbox-window{display:flex;flex-direction:column;max-height:min(82vh,780px)}
+.toolbox-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.toolbox-heading,.toolbox-header-actions{display:flex;align-items:center;gap:13px}.toolbox-mark{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:13px;background:var(--surface-soft);color:var(--accent-strong);font-size:22px}
+.toolbox-heading p{margin:0 0 3px;color:var(--subtle);font-size:9px;font-weight:750;letter-spacing:1.1px}.toolbox-heading h2{margin:0;font-size:21px;letter-spacing:-.4px}
+.local-tool-badge{padding:6px 9px;border:1px solid var(--line);border-radius:99px;background:var(--surface-raised);color:var(--muted);font-size:10px;white-space:nowrap}
+.toolbox-close{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--surface-raised);color:var(--muted);font-size:22px;line-height:1}.toolbox-close:hover{border-color:var(--line-strong);color:var(--text)}
+.toolbox-layout{min-height:430px;display:grid;grid-template-columns:190px minmax(0,1fr)}.toolbox-tabs{display:grid;align-content:start;gap:6px;padding:17px 12px;border-right:1px solid var(--line);background:var(--surface-raised)}
+.toolbox-tabs button{min-height:42px;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--muted);text-align:left;font-size:12px;font-weight:600}
+.toolbox-tabs button[aria-selected=true]{border-color:var(--line);background:var(--surface);color:var(--accent-strong);box-shadow:0 3px 12px rgba(0,0,0,.04)}
+.toolbox-content{min-width:0;max-height:min(72vh,680px);overflow:auto;padding:24px 26px}
+.tool-panel-intro{margin-bottom:20px}.tool-eyebrow{color:var(--subtle);font-size:9px;font-weight:750;letter-spacing:1.1px}.tool-panel-intro h3{margin:5px 0 4px;font-size:22px;letter-spacing:-.4px}.tool-panel-intro p,.tool-hint{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.tool-label{display:block;margin:15px 0 7px;color:var(--muted);font-size:11px;font-weight:700}
+.tool-input,.tool-select,.tool-textarea,.tool-input-row input{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-raised);color:var(--text);font:inherit}
+.tool-input-row{display:flex;gap:8px}.tool-input-row input{flex:1}.tool-select{min-height:40px}.tool-textarea{min-height:170px;resize:vertical;line-height:1.55}
+.tool-primary{min-height:39px;padding:8px 14px;border:1px solid var(--accent);border-radius:10px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;white-space:nowrap}.tool-primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.tool-result{display:block;margin:12px 0;padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft);color:var(--text);font-size:15px;font-weight:650;overflow-wrap:anywhere}
+.tool-hint{margin-top:10px;font-size:10px}.tool-examples{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:18px}.tool-examples>span{margin-right:3px;color:var(--subtle);font-size:10px;font-weight:700}.tool-examples button,.text-actions button{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface-raised);color:var(--muted);font-size:10px}.tool-examples button:hover,.text-actions button:hover{border-color:var(--line-strong);color:var(--accent-strong)}
+.tool-convert-grid{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:end;gap:10px;margin-top:14px}.tool-field{min-width:0}.tool-field span{display:block;margin:0 0 6px;color:var(--subtle);font-size:10px;font-weight:700}.convert-arrow{padding-bottom:11px;color:var(--accent);font-size:20px}
+.text-stats{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.text-stats span{padding:5px 8px;border:1px solid var(--line);border-radius:99px;background:var(--surface-raised);color:var(--muted);font-size:10px}.text-actions{display:flex;flex-wrap:wrap;gap:6px}.text-actions [data-text-action=insert]{border-color:var(--accent);background:var(--accent);color:#fff}.text-actions [data-text-action=insert]:hover{background:var(--accent-strong)}
+.tool-launch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.tool-launch-grid button{min-height:74px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-raised);color:var(--text);text-align:left}.tool-launch-grid button:hover{border-color:var(--line-strong);background:var(--surface-soft)}.tool-launch-grid b,.tool-launch-grid span{display:block}.tool-launch-grid b{margin-bottom:5px;font-size:12px}.tool-launch-grid span{color:var(--muted);font-size:10px;line-height:1.45}
+@media(max-width:650px){.toolbox-dialog{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:14px}.toolbox-window{max-height:calc(100vh - 16px)}.toolbox-header{padding:13px 14px}.local-tool-badge{display:none}.toolbox-layout{min-height:0;grid-template-columns:1fr}.toolbox-tabs{display:flex;overflow-x:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line)}.toolbox-tabs button{flex:0 0 auto;min-height:36px}.toolbox-tabs button span{white-space:nowrap}.toolbox-content{max-height:calc(100vh - 190px);padding:17px}.tool-launch-grid{grid-template-columns:1fr 1fr}.tool-input-row{flex-wrap:wrap}.tool-input-row .tool-primary{width:100%}}
+
+/* Conversation-first studio composition; existing palette and orbital animation are retained. */
+@media(min-width:961px){
+ .workspace{grid-template-columns:minmax(0,1fr) 310px;grid-template-rows:auto minmax(280px,1fr) auto auto;grid-template-areas:"hero tools" "chat tools" "prompts tools" "composer tools";column-gap:20px;align-items:start;padding:0 20px 18px}
+ .center-panel{display:contents}
+ .hero{grid-area:hero;display:grid;grid-template-columns:146px minmax(0,1fr);grid-template-rows:auto auto auto;align-items:center;justify-items:start;min-height:157px;margin:14px 0 8px;padding:10px 20px;text-align:left}
+ .hero-kicker{grid-column:1/-1;grid-row:1;justify-content:flex-start}
+ .cosmic-logo{grid-column:1;grid-row:2/span 2;margin:0 auto}
+ .hero h1{grid-column:2;grid-row:2;margin:0;font-size:clamp(26px,2.4vw,35px)}
+ .hero-subtitle{grid-column:2;grid-row:3;margin:3px 0 0}
+ .feature-grid{display:none}
+ .chat-area{grid-area:chat;width:100%;max-width:1000px;min-height:300px;margin:0 auto;padding:10px 8px}
+ .prompt-chips{grid-area:prompts;align-self:center;margin:5px auto 12px}
+ .composer-wrap{grid-area:composer;width:100%;max-width:1000px;margin:0 auto;padding:0 8px 12px}
+ .right-panel{grid-area:tools;align-self:stretch;min-height:100%;padding:16px 0 10px 16px;border-left:1px solid var(--line);background:transparent}
+}
+@media(max-width:960px){
+ .hero{display:grid;grid-template-columns:146px minmax(0,1fr);grid-template-rows:auto auto auto;align-items:center;justify-items:start;min-height:157px;margin:10px;padding:12px 16px;text-align:left}
+ .hero-kicker{grid-column:1/-1;grid-row:1;justify-content:flex-start}
+ .cosmic-logo{grid-column:1;grid-row:2/span 2;margin:0 auto}
+ .hero h1{grid-column:2;grid-row:2;margin:0;font-size:clamp(25px,4vw,34px)}
+ .hero-subtitle{grid-column:2;grid-row:3;margin:3px 0 0}
+ .feature-grid{display:none}
+ .chat-area{min-height:260px}
+}
+@media(max-width:650px){
+ .hero{display:flex;flex-direction:column;align-items:center;min-height:0;padding:14px 10px 12px;text-align:center}
+ .hero-kicker{justify-content:center}
+ .cosmic-logo{margin:3px auto 0}
+ .hero h1{margin:0;font-size:clamp(25px,8vw,32px)}
+ .hero-subtitle{margin:0 0 3px}
+ .chat-area{min-height:220px}
+}
