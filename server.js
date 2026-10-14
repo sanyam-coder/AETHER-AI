@@ -97,12 +97,13 @@ app.post("/api/chat", rateLimit({
         model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
         messages: chatMessages,
         temperature: 0.7,
-        max_tokens: 2048
+        max_tokens: 2048,
+        stream: true
       })
     });
 
-    const data = await response.json();
     if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
       console.error("Groq API error:", response.status, data?.error?.message || "Unknown error");
       const status = response.status === 429 ? 429 : (response.status === 401 ? 401 : 502);
       return res.status(status).json({
@@ -114,17 +115,60 @@ app.post("/api/chat", rateLimit({
       });
     }
 
-    const reply = data.choices?.[0]?.message?.content?.trim();
-    if (!reply) return res.status(502).json({ error: "The AI returned an empty reply. Try again." });
-    res.json({ reply });
+    res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders?.();
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let pending = "";
+    let replyLength = 0;
+    let finished = false;
+    const sendLine = value => res.write(JSON.stringify(value) + "\n");
+    const processLine = line => {
+      if (!line.startsWith("data:")) return;
+      const payload = line.slice(5).trim();
+      if (!payload || payload === "[DONE]") { finished = true; return; }
+      let event;
+      try { event = JSON.parse(payload); } catch { return; }
+      const delta = event.choices?.[0]?.delta?.content;
+      if (typeof delta === "string" && delta) {
+        replyLength += delta.length;
+        sendLine({ delta });
+      }
+      const error = event.error?.message;
+      if (error) throw new Error(error);
+    };
+
+    while (!finished) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      pending += decoder.decode(value, { stream: true });
+      const lines = pending.split(/\r?\n/);
+      pending = lines.pop() || "";
+      for (const line of lines) processLine(line);
+    }
+    pending += decoder.decode();
+    if (pending.trim()) processLine(pending.trim());
+    if (!replyLength) {
+      sendLine({ error: "The AI returned an empty reply. Try again." });
+    } else {
+      sendLine({ done: true });
+    }
+    res.end();
   } catch (err) {
     console.error("Chat error:", err.message);
     const timedOut = err.name === "TimeoutError" || err.name === "AbortError";
-    res.status(timedOut ? 504 : 502).json({
-      error: timedOut
+    const message = timedOut
         ? "The AI service took too long to respond. Please try again."
-        : "Could not reach Groq. Check your internet connection and server logs."
-    });
+        : "Could not reach Groq. Check your internet connection and server logs.";
+    if (res.headersSent) {
+      res.write(JSON.stringify({ error: message }) + "\n");
+      res.end();
+    } else {
+      res.status(timedOut ? 504 : 502).json({ error: message });
+    }
   }
 });
 

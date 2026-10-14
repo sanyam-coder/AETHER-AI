@@ -27,6 +27,7 @@ let fileContext = "";
 let fileName = "";
 let busy = false;
 let readReplies = false;
+let speechRunId = 0;
 
 function makeId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -343,12 +344,83 @@ async function send(text) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: apiMessages })
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
-    messages.push({ role: "assistant", content: data.reply, time: Date.now() });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || `Request failed (${response.status})`);
+    }
+    if (!response.body) throw new Error("This browser cannot stream AI replies. Please update your browser.");
+
+    let runId = ++speechRunId;
+    let reply = "";
+    let speechBuffer = "";
+    let streamLine = "";
+    const assistantRow = document.createElement("div");
+    assistantRow.className = "chat-message assistant";
+    const avatar = document.createElement("div");
+    avatar.className = "assistant-avatar";
+    avatar.textContent = "A";
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+    const name = document.createElement("div");
+    name.className = "message-name";
+    name.textContent = "AETHER AI";
+    const liveText = document.createElement("p");
+    liveText.setAttribute("aria-live", "polite");
+    bubble.append(name, liveText);
+    assistantRow.append(avatar, bubble);
+    $("thinking")?.remove();
+    chatArea.appendChild(assistantRow);
+
+    const queueSpeechText = (flush = false) => {
+      if (!readReplies) { speechBuffer = ""; return; }
+      if (runId !== speechRunId) runId = speechRunId;
+      while (speechBuffer) {
+        const punctuation = speechBuffer.match(/^.{35,}?[.!?。！？](?:["'”’)]*)\s+/s);
+        let cut = punctuation ? punctuation[0].length : 0;
+        if (!cut && (speechBuffer.length >= 190 || flush)) {
+          cut = Math.min(190, speechBuffer.length);
+          if (cut < speechBuffer.length) {
+            const space = speechBuffer.lastIndexOf(" ", cut);
+            if (space > 80) cut = space + 1;
+          }
+        }
+        if (!cut) break;
+        const part = speechBuffer.slice(0, cut).trim();
+        speechBuffer = speechBuffer.slice(cut);
+        if (part) speak(part, runId);
+      }
+    };
+    const handleStreamLine = line => {
+      if (!line.trim()) return;
+      let event;
+      try { event = JSON.parse(line); } catch { return; }
+      if (event.error) throw new Error(event.error);
+      if (event.delta) {
+        reply += event.delta;
+        liveText.textContent = reply;
+        chatArea.scrollTop = chatArea.scrollHeight;
+        speechBuffer += event.delta;
+        queueSpeechText();
+      }
+    };
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      streamLine += decoder.decode(value, { stream: true });
+      const lines = streamLine.split(/\r?\n/);
+      streamLine = lines.pop() || "";
+      for (const line of lines) handleStreamLine(line);
+    }
+    streamLine += decoder.decode();
+    if (streamLine.trim()) handleStreamLine(streamLine);
+    queueSpeechText(true);
+    if (!reply.trim()) throw new Error("The AI returned an empty reply. Try again.");
+    messages.push({ role: "assistant", content: reply, time: Date.now() });
     save();
-    if (readReplies) speak(data.reply);
   } catch (err) {
+    speechRunId += 1;
     messages.push({ role: "assistant", content: "I couldn’t answer that: " + err.message, time: Date.now() });
     save();
   } finally {
@@ -489,7 +561,10 @@ $("topSpeak").addEventListener("click", () => {
   readReplies = !readReplies;
   $("topSpeak").style.color = readReplies ? "#43efff" : "";
   toast(readReplies ? "Spoken replies enabled." : "Spoken replies disabled.");
-  if (!readReplies && "speechSynthesis" in window) speechSynthesis.cancel();
+  if (!readReplies) {
+    speechRunId += 1;
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+  }
 });
 function speechLanguage(text = "") {
   const lang = $("language").value;
@@ -498,11 +573,22 @@ function speechLanguage(text = "") {
   if (lang === "fr") return "fr-FR";
   return "en-US";
 }
-function speak(text) {
+function speak(text, runId = null) {
   if (!("speechSynthesis" in window)) return toast("Spoken replies are not supported by this browser.");
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.slice(0, 5000));
+  if (runId === null) {
+    speechRunId += 1;
+    speechSynthesis.cancel();
+    runId = speechRunId;
+  }
+  return queueSpeech(text, runId);
+}
+function queueSpeech(text, runId) {
+  if (!("speechSynthesis" in window) || runId !== speechRunId) return;
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = speechLanguage(text);
+  utterance.onerror = event => {
+    if (event.error !== "canceled" && event.error !== "interrupted") console.warn("Speech synthesis:", event.error);
+  };
   speechSynthesis.speak(utterance);
 }
 async function copyText(text, successMessage = "Copied to clipboard.") {
