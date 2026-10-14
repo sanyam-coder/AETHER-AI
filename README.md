@@ -31,6 +31,7 @@ Keep `.env` private; never commit an API key. On Render, set `GROQ_API_KEY` (and
 - Optional local assistant context (up to 2,000 characters) and explicit opt-in to include it with new prompts; it remains in this browser until the user clears it
 - Browser-provided speech recognition and speech synthesis where supported
 - Six response styles: Balanced, Quick, Deep dive, Tutor, Builder, and Creative
+- Default formatting favors concise prose and ordinary punctuation: simple factual answers avoid unnecessary headings, hashtags, dash lists, numbered lists, and divider lines; structured formats remain available when requested or useful
 - Focus mode hides the side panels; responses and code blocks have copy controls; the current thread can be exported as Markdown
 - Text/code file reading: TXT, MD, CSV, JSON, JS, HTML, CSS, XML, LOG; 2 MB upload cap and at most 30,000 characters sent with a chat request
 - Toolbox utilities: arithmetic calculator with a safe parser, unit conversion (length, mass, temperature, digital storage, time), and a local Text Lab (counts, case/spacing cleanup, duplicate-line removal, JSON formatting, copy, and send-to-chat)
