@@ -104,10 +104,12 @@ function renderRecent() {
   closeChatMenu();
   list.replaceChildren();
   const recent = threads.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const count = $("savedChatCount");
+  if (count) count.textContent = String(recent.length);
   if (!recent.length) {
     const empty = document.createElement("div");
     empty.className = "recent-empty";
-    empty.textContent = "Your saved conversations will appear here.";
+    empty.textContent = "No saved chats on this device yet. Chats are stored only in this browser.";
     list.appendChild(empty);
     return;
   }
