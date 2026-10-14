@@ -621,6 +621,8 @@ function closeMobileSidebar(returnFocus = false) {
   sidebar.classList.remove("open");
   $("sidebarBackdrop").hidden = true;
   menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", "Open AETHER workspace menu");
+  menuButton.title = "Open AETHER workspace menu";
   if (returnFocus) menuButton.focus();
 }
 function chooseMode(mode) {
@@ -674,6 +676,8 @@ function updatePhoneDrawerLayout() {
     sidebar.classList.remove("open");
     $("sidebarBackdrop").hidden = true;
     $("mobileMenu").setAttribute("aria-expanded", "false");
+    $("mobileMenu").setAttribute("aria-label", "Open AETHER workspace menu");
+    $("mobileMenu").title = "Open AETHER workspace menu";
     phoneMovedNodes.reverse().forEach(({ node, marker }) => {
       if (marker.parentNode) marker.parentNode.insertBefore(node, marker);
       marker.remove();
@@ -689,6 +693,8 @@ $("mobileMenu").addEventListener("click", () => {
   const isOpen = $("sidebar").classList.toggle("open");
   $("sidebarBackdrop").hidden = !isOpen;
   $("mobileMenu").setAttribute("aria-expanded", String(isOpen));
+  $("mobileMenu").setAttribute("aria-label", isOpen ? "Close AETHER workspace menu" : "Open AETHER workspace menu");
+  $("mobileMenu").title = isOpen ? "Close AETHER workspace menu" : "Open AETHER workspace menu";
   if (isOpen) $("mobileMenu").focus();
 });
 $("sidebarBack").addEventListener("click", () => closeMobileSidebar(true));

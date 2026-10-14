@@ -822,8 +822,9 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
  .brand-mark{width:30px;height:30px;flex:0 0 30px}
  .brand-copy strong{font-size:12px;letter-spacing:.2px}
  .brand-copy small{display:none}
- .mobile-menu{grid-column:3;grid-row:1;width:36px;height:36px;display:grid!important;place-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent-strong);font-size:27px;line-height:.8;box-shadow:0 3px 10px rgba(54,55,98,.05)}
- .mobile-menu[aria-expanded=true]{background:var(--surface-soft)}
+ .mobile-menu{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 8px);right:10px;z-index:60!important;width:44px;height:44px;display:grid!important;place-items:center;border:1px solid rgba(255,255,255,.72);border-radius:14px;background:linear-gradient(145deg,#7057dc,#8b64ed);color:#fff;box-shadow:0 7px 20px rgba(83,63,177,.32);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+ .mobile-menu svg{width:20px;height:20px;display:block}
+ .mobile-menu[aria-expanded=true]{background:linear-gradient(145deg,#5e49c5,#7955d8);box-shadow:0 9px 24px rgba(83,63,177,.42)}
  .sidebar-back{display:none!important}
  .sidebar-header>.searchbar{grid-column:2;grid-row:1;width:100%;min-width:0;height:34px;margin:0;padding:0 7px;gap:5px}
  .sidebar-header>.searchbar>span{font-size:14px}
