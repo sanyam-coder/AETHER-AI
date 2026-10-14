@@ -267,6 +267,7 @@ textarea::placeholder { color: #818e9f; }
 .composer-hint { margin-left: 3px; color: #758396; font-size: 9px; }
 .mic-button, .send-button { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #34445b; border-radius: 9px; background: #192432; color: #c1cee0; font-size: 16px; }
 .mic-button:hover { border-color: #5a6c87; background: #202d3e; }
+.mic-button svg { width: 17px; height: 17px; display: block; }
 .send-button { border-color: #5473b9; background: #536fae; color: #fff; font-size: 18px; transition: background .16s, transform .16s; }
 .send-button:hover { transform: translateY(-1px); background: #6383c9; }
 .send-button:disabled { opacity: .55; cursor: wait; }
