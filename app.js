@@ -21,6 +21,7 @@ const MAX_THREADS = 10;
 const MAX_MESSAGES = 40;
 const MAX_SAVED_MESSAGE_CHARS = 12000;
 let threads = [];
+let legacyHistoryRestored = false;
 let activeThreadId = null;
 let messages = [];
 let fileContext = "";
@@ -52,15 +53,22 @@ if (!threads.length) {
     if (Array.isArray(legacy) && legacy.length) {
       const first = legacy.find(m => m?.role === "user")?.content || "Previous conversation";
       threads = [{ id: makeId(), title: String(first).slice(0, 48), updatedAt: Date.now(), messages: legacy.slice(-MAX_MESSAGES) }];
+      legacyHistoryRestored = true;
     }
   } catch { /* Ignore damaged browser history and start cleanly. */ }
 }
-activeThreadId = localStorage.getItem(ACTIVE_STORAGE);
+try { activeThreadId = localStorage.getItem(ACTIVE_STORAGE); } catch { activeThreadId = null; }
 let activeThread = threads.find(t => t.id === activeThreadId) || threads.slice().sort((a, b) => b.updatedAt - a.updatedAt)[0];
 if (activeThread) {
   activeThreadId = activeThread.id;
   messages = activeThread.messages.slice(-MAX_MESSAGES);
-  localStorage.setItem(ACTIVE_STORAGE, activeThreadId);
+  try {
+    localStorage.setItem(ACTIVE_STORAGE, activeThreadId);
+    if (legacyHistoryRestored) {
+      localStorage.setItem(STORAGE, JSON.stringify(threads));
+      localStorage.removeItem(LEGACY_STORAGE);
+    }
+  } catch { /* Keep the in-memory thread visible when browser storage is unavailable. */ }
 }
 
 function toast(text) {
