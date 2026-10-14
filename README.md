@@ -21,9 +21,14 @@ Keep `.env` private; never commit an API key. On Render, set `GROQ_API_KEY` (and
 ## What works
 
 - Chat responses through the Groq API when a valid key/model is configured
-- Conversation-first studio layout with a compact animated-logo header, dedicated chat canvas, tool dock, and accessible Toolbox tabs; the existing palette and orbital-logo animation are retained
-- English Wikipedia article search (not broad web search)
+- Intent-led studio workspace with Assistant, Wikipedia-grounded Research, Code, Writing, Learn and Plan modes; response-style selection remains separate
+- Conversation-first layout with the animated orbital logo, responsive phone three-dot drawer, work-mode strip and accessible Toolbox tabs
+- The main search field submits ordinary questions to AETHER; prefix a query with `wiki:` to search English Wikipedia. Research mode fetches up to five English Wikipedia results to ground its answer and cite the supplied links; it is not broad web or live-news research
 - Up to 10 browser-local conversation threads, keeping up to 40 messages per thread (not account-based or synced; saved message text is capped at 12,000 characters)
+- Find saved chats by matching titles or message text while retaining Share, Markdown Download, confirmed Delete and current-chat Clear behavior
+- Export/import bounded local JSON chat backups to manually move history between browser profiles or devices; import merges by thread ID and keeps the 10 most recently updated threads
+- Stop an in-progress response; stopping preserves any partial reply, and the server aborts its upstream request when the browser disconnects
+- Optional local assistant context (up to 2,000 characters) and explicit opt-in to include it with new prompts; it remains in this browser until the user clears it
 - Browser-provided speech recognition and speech synthesis where supported
 - Six response styles: Balanced, Quick, Deep dive, Tutor, Builder, and Creative
 - Focus mode hides the side panels; responses and code blocks have copy controls; the current thread can be exported as Markdown
@@ -39,9 +44,9 @@ This is a small public demo, not a complete production service. There is no sign
 
 Chat prompts and any attached text included in a question are sent from this server to Groq to generate a reply. Do not submit passwords, secrets, or sensitive personal information. Search queries go to the English Wikipedia API. Voice input/output uses the browser's speech features.
 
-Response-style instructions are added to the prompt sent to Groq. Chat export is generated locally in the browser and downloads a Markdown file. Focus mode and response style are saved only in the current browser profile. The Toolbox calculator, converter, and Text Lab process content in the current browser tab; use “Send to chat” only when you want text submitted to Groq.
+Work-mode, response-style, language, and optional assistant-profile instructions are added to the request sent to Groq. Profile context is included only after the user enables its checkbox in Settings; it is capped at 2,000 characters and is stored locally. Chat and backup exports are generated locally in the browser. Focus mode, work mode, response style, and local preferences are saved only in the current browser profile. The Toolbox calculator, converter, and Text Lab process content in the current browser tab; use “Send to chat” only when you want text submitted to Groq.
 
-Saved chat history remains in this browser only. Share acts only after the user selects it and uses the browser’s share sheet when available, otherwise it copies the transcript. Clear and Delete ask for confirmation and affect only the selected/current chat; other saved conversations are kept.
+Saved chat history remains in this browser only, unless the user chooses to download and manually import a backup. Backup files contain conversation text; keep them private. Import accepts only AETHER JSON backups up to 6 MB, at most 10 chats, 40 messages per chat, and 12,000 characters per message. Share acts only after the user selects it and uses the browser’s share sheet when available, otherwise it copies the transcript. Clear and Delete ask for confirmation and affect only the selected/current chat; other saved conversations are kept.
 
 The built-in API throttles are per-process and reset when the server restarts; for multiple instances, use a shared rate-limit store. Public deployment should also use an approved provider budget/usage limit and monitor logs. This repository does not include a general web-search provider, image-generation service, authentication, or cloud database; those require separately selected services/credentials and configuration. Render's free instance may sleep when idle, so its first response can be delayed.
 

@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f4fa">
-  <meta name="description" content="AETHER AI is a browser-based AI workspace with chat, voice, code help, English Wikipedia search, text-file analysis, and local calculator, unit-converter, and text tools.">
+  <meta name="description" content="AETHER AI is a flexible AI workbench for chat, research, code, writing, learning, voice, files, and private browser tools.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AETHER AI — Beyond intelligence">
   <meta property="og:description" content="Chat with AETHER AI, explore code, search Wikipedia, analyze text files, and use built-in local productivity tools.">
   <title>AETHER AI — Beyond intelligence</title>
-  <link rel="stylesheet" href="/style.css?v=phone-saved-chats-visible-v5-20261014">
+  <link rel="stylesheet" href="/style.css?v=aether-workbench-v1-20261014">
 </head>
 <body>
 <div class="app-shell">
@@ -37,6 +37,7 @@
     </nav>
 
     <div class="recent-heading"><span>◷</span> Saved chats <span class="recent-count" id="savedChatCount" aria-live="polite">0</span><small>on this device</small></div>
+    <label class="recent-filter" aria-label="Find a saved chat"><span>⌕</span><input id="chatFilter" type="search" placeholder="Find a chat…" autocomplete="off"></label>
     <div class="recent-list" id="recentList" aria-label="Saved chats"></div>
     <div class="sidebar-footer">
       <span class="pulse-dot"></span>
@@ -48,7 +49,7 @@
 
   <main class="main-area">
     <header class="topbar">
-      <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search English Wikipedia or ask anything…" aria-label="Search English Wikipedia or ask AETHER AI"></div>
+      <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Ask AETHER, or type wiki: topic…" aria-label="Ask AETHER AI, or type wiki colon followed by a topic to search Wikipedia"></div>
       <button class="studio-action focus-action" id="focusModeToggle" type="button" aria-pressed="false" title="Hide side panels for focused reading">◫ <span>Focus</span></button>
       <button class="studio-action" id="openToolbox" type="button" title="Open built-in tools">⊞ <span>Tools</span></button>
       <button class="studio-action clear-action" id="clearChat" type="button" title="Clear the current conversation" aria-label="Clear current chat">⌫ <span>Clear Chat</span></button>
@@ -57,9 +58,22 @@
         <span class="online-indicator"><i></i> Online <b>•</b> <span id="connectionLabel">Checking AI connection…</span></span>
         <label class="language-select" aria-label="Reply language">◎ <select id="language"><option value="auto">Auto language</option><option value="en">English</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option></select></label>
         <button class="icon-button" id="topSpeak" title="Toggle spoken replies" aria-label="Toggle spoken replies">◖))</button>
-        <button class="profile-button" id="profileButton" title="Sign-in is not available in this demo" aria-label="Demo profile; sign-in unavailable">A</button>
+      <button class="profile-button" id="profileButton" title="Personalize workspace and manage local data" aria-label="Personalize workspace and manage local data">A</button>
       </div>
     </header>
+
+    <nav class="workflow-switcher" aria-label="AETHER work modes">
+      <div class="workflow-caption"><small>WORKSPACE MODES</small><strong>Choose your intent</strong></div>
+      <div class="workflow-list" role="group" aria-label="Select an AI work mode">
+        <button type="button" class="workflow-button active" data-workflow="assistant" aria-pressed="true"><span>✦</span> Assistant</button>
+        <button type="button" class="workflow-button" data-workflow="research" aria-pressed="false"><span>⌕</span> Research</button>
+        <button type="button" class="workflow-button" data-workflow="code" aria-pressed="false"><span>‹/›</span> Code</button>
+        <button type="button" class="workflow-button" data-workflow="write" aria-pressed="false"><span>✎</span> Writing</button>
+        <button type="button" class="workflow-button" data-workflow="study" aria-pressed="false"><span>⌑</span> Learn</button>
+        <button type="button" class="workflow-button" data-workflow="plan" aria-pressed="false"><span>◷</span> Plan</button>
+      </div>
+      <p class="workflow-hint" id="workflowHint">Flexible help for questions, ideas, and everyday work.</p>
+    </nav>
 
     <section class="workspace">
       <section class="center-panel">
@@ -112,6 +126,7 @@
                 <span class="composer-hint">Enter to send · Shift+Enter for new line</span>
               </div>
               <div class="composer-right">
+                <button type="button" class="stop-button" id="stopButton" title="Stop the current reply" aria-label="Stop generating" hidden>■ <span>Stop</span></button>
                 <button type="button" class="mic-button" id="micButton" title="Voice input (browser support required)" aria-label="Start voice input"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg></button>
                 <button type="submit" class="send-button" id="sendButton" title="Send message" aria-label="Send message">➤</button>
               </div>
@@ -216,6 +231,22 @@
     </div>
 </div>
 </dialog>
+<dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+  <form class="settings-window" method="dialog">
+    <header class="settings-header"><div><p>AETHER CONTROL ROOM · PRIVATE BY DEFAULT</p><h2 id="settingsTitle">Personalize your workspace</h2></div><button class="toolbox-close" id="closeSettings" type="button" aria-label="Close settings">×</button></header>
+    <div class="settings-content">
+      <section class="settings-section"><span class="tool-eyebrow">LOCAL ASSISTANT CONTEXT</span><h3>How should AETHER work with you?</h3><p>This context is saved in this browser. It is only sent to Groq when the opt-in below is enabled and you send a chat message.</p>
+        <label class="tool-label" for="profileContext">Your preferences or ongoing context</label><textarea class="tool-textarea" id="profileContext" rows="5" maxlength="2000" placeholder="Example: I am learning Python. Explain new ideas simply and include one short example."></textarea>
+        <div class="settings-inline"><label class="settings-check"><input id="useProfileContext" type="checkbox"> Include this context in new replies</label><span id="profileCharCount">0 / 2,000</span></div>
+        <div class="settings-actions"><button class="tool-primary" id="saveProfileSettings" type="button">Save preferences</button><button class="settings-secondary" id="clearProfileSettings" type="button">Clear local context</button></div>
+      </section>
+      <section class="settings-section"><span class="tool-eyebrow">PORTABLE LOCAL HISTORY</span><h3>Back up your saved chats</h3><p>History lives only in this browser. Export a local backup to move conversations to another device, then import that file here. Nothing is uploaded.</p>
+        <div class="settings-actions"><button class="settings-secondary" id="exportBackup" type="button">⇩ Export chat backup</button><button class="settings-secondary" id="importBackup" type="button">⇧ Import chat backup</button><input id="backupFileInput" type="file" accept=".json,application/json" hidden></div>
+      </section>
+      <p class="settings-privacy">AETHER does not provide account login or automatic cloud sync. Do not store passwords, API keys, or sensitive personal information here.</p>
+    </div>
+  </form>
+</dialog>
 <div class="chat-context-menu" id="chatContextMenu" role="menu" aria-label="Saved chat actions" hidden>
   <button type="button" role="menuitem" data-chat-action="share"><span>↗</span> Share</button>
   <button type="button" role="menuitem" data-chat-action="download"><span>⇩</span> Download</button>
@@ -223,6 +254,6 @@
   <button type="button" role="menuitem" class="delete-chat-action" data-chat-action="delete"><span>⌫</span> Delete</button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/app.js?v=phone-saved-chats-20261014" defer></script>
+<script src="/app.js?v=aether-workbench-v1-20261014" defer></script>
 </body>
 </html>
