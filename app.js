@@ -255,6 +255,39 @@ window.addEventListener("resize", () => closeChatMenu());
 function esc(text) {
   return String(text).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 }
+function cleanAssistantFormatting(raw) {
+  const protectedBlocks = [];
+  const protect = block => `\u0000AETHER_BLOCK_${protectedBlocks.push(block) - 1}\u0000`;
+  let text = String(raw ?? "")
+    .replace(/```[^\n`]*[ \t]*(?:\r?\n|$)[\s\S]*?(?:```|$)/g, protect)
+    .replace(/`[^`\n]+`/g, protect);
+  const paragraphs = [];
+  let paragraph = [];
+  let lastHeading = "";
+  const flush = () => {
+    if (paragraph.length) paragraphs.push(paragraph.join(" ").replace(/\s+/g, " ").trim());
+    paragraph = [];
+  };
+  for (const originalLine of text.split(/\r?\n/)) {
+    const trimmed = originalLine.trim();
+    if (!trimmed) { flush(); continue; }
+    if (/^(?:[-–—_*─━]\s*){3,}$/.test(trimmed)) continue;
+    const heading = trimmed.match(/^#{1,6}\s*(.*)$/);
+    if (heading) {
+      lastHeading = heading[1].trim();
+      continue;
+    }
+    const item = trimmed.match(/^(?:[-*+•]|\d+[.)])\s+(.+)$/);
+    let line = item ? item[1].trim() : trimmed;
+    line = line.replace(/\s+[—–]\s+/g, ", ");
+    if (item && !/[.!?…]$/.test(line)) line += ".";
+    paragraph.push(line);
+  }
+  flush();
+  text = paragraphs.join("\n\n") || lastHeading;
+  if (text && !/[.!?…]$/.test(text)) text += ".";
+  return text.replace(/\u0000AETHER_BLOCK_(\d+)\u0000/g, (_match, index) => protectedBlocks[Number(index)]);
+}
 function formatted(text) {
   let s = esc(text);
   s = s.replace(/\[([^\]]{1,250})\]\((https:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
@@ -264,6 +297,7 @@ function formatted(text) {
   return s;
 }
 function drawMessage(message) {
+  const messageContent = message.role === "user" ? message.content : cleanAssistantFormatting(message.content);
   const row = document.createElement("div");
   row.className = "chat-message " + (message.role === "user" ? "user" : "assistant");
   const avatar = document.createElement("div");
@@ -278,7 +312,7 @@ function drawMessage(message) {
     bubble.appendChild(name);
   }
   const body = document.createElement("div");
-  body.innerHTML = formatted(message.content);
+  body.innerHTML = formatted(messageContent);
   body.querySelectorAll("pre").forEach(pre => {
     const code = pre.querySelector("code");
     if (!code) return;
@@ -302,7 +336,7 @@ function drawMessage(message) {
     copyButton.textContent = "⧉ Copy";
     copyButton.title = "Copy this reply";
     copyButton.addEventListener("click", async () => {
-      try { await copyText(message.content, "Reply copied."); }
+      try { await copyText(messageContent, "Reply copied."); }
       catch { toast("Could not copy this reply in your browser."); }
     });
     actions.appendChild(copyButton);
@@ -323,8 +357,8 @@ function drawMessage(message) {
       }
       document.querySelectorAll(".reply-speak-button").forEach(button => button.textContent = "🔊 Read aloud");
       speakButton.textContent = "⏹ Stop speaking";
-      const utterance = new SpeechSynthesisUtterance(message.content.slice(0, 5000));
-      utterance.lang = speechLanguage(message.content);
+      const utterance = new SpeechSynthesisUtterance(messageContent.slice(0, 5000));
+      utterance.lang = speechLanguage(messageContent);
       utterance.onend = () => { speakButton.textContent = "🔊 Read aloud"; };
       utterance.onerror = () => { speakButton.textContent = "🔊 Read aloud"; toast("Could not play this reply. Try again."); };
       speechSynthesis.speak(utterance);
@@ -470,7 +504,7 @@ async function send(text) {
         if (!cut) break;
         const part = speechBuffer.slice(0, cut).trim();
         speechBuffer = speechBuffer.slice(cut);
-        if (part) speak(part, runId);
+        if (part) speak(cleanAssistantFormatting(part), runId);
       }
     };
     const handleStreamLine = line => {
@@ -480,7 +514,7 @@ async function send(text) {
       if (event.error) throw new Error(event.error);
       if (event.delta) {
         streamedReply += event.delta;
-        liveText.textContent = streamedReply;
+        liveText.textContent = cleanAssistantFormatting(streamedReply);
         chatArea.scrollTop = chatArea.scrollHeight;
         speechBuffer += event.delta;
         queueSpeechText();
@@ -500,13 +534,13 @@ async function send(text) {
     if (streamLine.trim()) handleStreamLine(streamLine);
     queueSpeechText(true);
     if (!streamedReply.trim()) throw new Error("The AI returned an empty reply. Try again.");
-    messages.push({ role: "assistant", content: streamedReply, time: Date.now(), workflow: selectedWorkflow });
+    messages.push({ role: "assistant", content: cleanAssistantFormatting(streamedReply), time: Date.now(), workflow: selectedWorkflow });
     save();
   } catch (err) {
     speechRunId += 1;
     if (err.name === "AbortError") {
       if (streamedReply.trim()) {
-        messages.push({ role: "assistant", content: streamedReply.trim() + "\n\n— Generation stopped by you.", time: Date.now(), workflow: selectedWorkflow });
+        messages.push({ role: "assistant", content: cleanAssistantFormatting(streamedReply.trim()) + "\n\nGeneration stopped by you.", time: Date.now(), workflow: selectedWorkflow });
         save();
       }
       toast("Generation stopped.");
@@ -719,7 +753,7 @@ function savedThreadMarkdown(thread) {
     `# ${title}`,
     `Exported from AETHER AI on ${new Date().toLocaleString()}`,
     "",
-    ...thread.messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.content}`)
+    ...thread.messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.role === "user" ? message.content : cleanAssistantFormatting(message.content)}`)
   ].join("\n\n");
 }
 function downloadSavedChat(threadId) {
@@ -813,7 +847,7 @@ function exportConversation() {
     `# ${title}`,
     `Exported from AETHER AI on ${new Date().toLocaleString()}`,
     "",
-    ...messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.content}`)
+    ...messages.map(message => `## ${message.role === "user" ? "You" : message.source === "search" ? "Wikipedia search" : "AETHER AI"}\n\n${message.role === "user" ? message.content : cleanAssistantFormatting(message.content)}`)
   ].join("\n\n");
   const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
