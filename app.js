@@ -436,13 +436,48 @@ $("newChat").addEventListener("click", () => {
   render();
   closeMobileSidebar();
 });
-$("mobileMenu").setAttribute("aria-controls", "sidebar");
+const phoneLayoutQuery = window.matchMedia("(max-width: 650px)");
+const phoneMovedNodes = [];
+const phoneDrawerControls = document.createElement("div");
+phoneDrawerControls.className = "phone-drawer-controls";
+phoneDrawerControls.setAttribute("aria-label", "Workspace controls");
+function moveIntoPhoneDrawer(node, destination) {
+  if (!node || node.parentNode === destination) return;
+  if (node.parentNode && !phoneMovedNodes.some(item => item.node === node)) {
+    const marker = document.createComment("desktop position");
+    node.parentNode.insertBefore(marker, node);
+    phoneMovedNodes.push({ node, marker });
+  }
+  destination.appendChild(node);
+}
+function updatePhoneDrawerLayout() {
+  const sidebar = $("sidebar");
+  if (phoneLayoutQuery.matches) {
+    moveIntoPhoneDrawer(document.querySelector(".searchbar"), document.querySelector(".sidebar-header"));
+    document.querySelectorAll(".topbar > .studio-action").forEach(node => moveIntoPhoneDrawer(node, phoneDrawerControls));
+    moveIntoPhoneDrawer(document.querySelector(".top-controls"), phoneDrawerControls);
+    moveIntoPhoneDrawer(phoneDrawerControls, sidebar);
+    moveIntoPhoneDrawer(document.querySelector(".right-panel"), sidebar);
+  } else {
+    sidebar.classList.remove("open");
+    $("sidebarBackdrop").hidden = true;
+    $("mobileMenu").setAttribute("aria-expanded", "false");
+    phoneMovedNodes.reverse().forEach(({ node, marker }) => {
+      if (marker.parentNode) marker.parentNode.insertBefore(node, marker);
+      marker.remove();
+    });
+    phoneMovedNodes.length = 0;
+    phoneDrawerControls.remove();
+  }
+}
+updatePhoneDrawerLayout();
+phoneLayoutQuery.addEventListener("change", updatePhoneDrawerLayout);
 $("mobileMenu").setAttribute("aria-expanded", "false");
 $("mobileMenu").addEventListener("click", () => {
   const isOpen = $("sidebar").classList.toggle("open");
   $("sidebarBackdrop").hidden = !isOpen;
   $("mobileMenu").setAttribute("aria-expanded", String(isOpen));
-  if (isOpen) $("sidebarBack").focus();
+  if (isOpen) $("mobileMenu").focus();
 });
 $("sidebarBack").addEventListener("click", () => closeMobileSidebar(true));
 $("sidebarBackdrop").addEventListener("click", () => closeMobileSidebar(true));

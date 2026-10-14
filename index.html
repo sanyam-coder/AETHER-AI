@@ -9,7 +9,7 @@
   <meta property="og:title" content="AETHER AI — Beyond intelligence">
   <meta property="og:description" content="Chat with AETHER AI, explore code, search Wikipedia, analyze text files, and use built-in local productivity tools.">
   <title>AETHER AI — Beyond intelligence</title>
-  <link rel="stylesheet" href="/style.css?v=phone-workspace-v2-icons-20261014">
+  <link rel="stylesheet" href="/style.css?v=three-dot-drawer-v2-20261014">
 </head>
 <body>
 <div class="app-shell">
@@ -19,13 +19,14 @@
         <span class="brand-mark"><span>A</span></span>
         <span class="brand-copy"><strong>AETHER <i>AI</i></strong><small>Beyond intelligence. Beyond limits.</small></span>
       </a>
+      <button class="mobile-menu" id="mobileMenu" type="button" aria-label="Open workspace menu" title="Open workspace menu" aria-controls="sidebar" aria-expanded="false">⋯</button>
       <button class="sidebar-back" id="sidebarBack" type="button" aria-label="Back to chat" title="Close navigation">← <span>Back</span></button>
     </div>
 
     <button class="new-chat" id="newChat"><span>＋</span> New chat</button>
     <nav class="nav-list" aria-label="Main navigation">
       <button class="nav-item active" data-mode="chat"><span class="nav-icon">◉</span>Chat</button>
-      <button class="nav-item" data-mode="voice"><span class="nav-icon">♩</span>Voice input</button>
+      <button class="nav-item" data-mode="voice"><span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/></svg></span>Voice input</button>
       <button class="nav-item" data-mode="search"><span class="nav-icon">⌕</span>Search Wikipedia</button>
       <button class="nav-item" data-mode="code"><span class="nav-icon">‹/›</span>Code &amp; Create</button>
       <button class="nav-item" data-mode="tools" aria-label="Open Toolbox"><span class="nav-icon">⊞</span>Toolbox</button>
@@ -47,7 +48,6 @@
 
   <main class="main-area">
     <header class="topbar">
-      <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
       <div class="searchbar"><span>◎</span><input id="globalSearch" placeholder="Search English Wikipedia or ask anything…" aria-label="Search English Wikipedia or ask AETHER AI"></div>
       <button class="studio-action focus-action" id="focusModeToggle" type="button" aria-pressed="false" title="Hide side panels for focused reading">◫ <span>Focus</span></button>
       <button class="studio-action" id="openToolbox" type="button" title="Open built-in tools">⊞ <span>Tools</span></button>
@@ -223,6 +223,6 @@
   <button type="button" role="menuitem" class="delete-chat-action" data-chat-action="delete"><span>⌫</span> Delete</button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/app.js?v=mobile-drawer-fix-20261014" defer></script>
+<script src="/app.js?v=three-dot-drawer-v2-20261014" defer></script>
 </body>
 </html>
