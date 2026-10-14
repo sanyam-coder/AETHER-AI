@@ -667,6 +667,7 @@ function moveIntoPhoneDrawer(node, destination) {
 function updatePhoneDrawerLayout() {
   const sidebar = $("sidebar");
   if (phoneLayoutQuery.matches) {
+    moveIntoPhoneDrawer($("mobileMenu"), document.body);
     moveIntoPhoneDrawer(document.querySelector(".searchbar"), document.querySelector(".sidebar-header"));
     document.querySelectorAll(".topbar > .studio-action").forEach(node => moveIntoPhoneDrawer(node, phoneDrawerControls));
     moveIntoPhoneDrawer(document.querySelector(".top-controls"), phoneDrawerControls);
