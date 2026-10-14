@@ -832,12 +832,15 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
  .recent-heading{order:2;display:flex;align-items:center;gap:5px;margin:0;padding:7px 3px 4px;font-size:11px}
  .recent-count{display:inline-grid;min-width:19px;height:19px;place-items:center;border-radius:999px;background:var(--surface-soft);color:var(--accent-strong);font-size:10px;font-weight:800}
  .recent-heading small{margin-left:auto}
- .recent-list{order:3;max-height:32vh;overflow:auto;overscroll-behavior:contain;padding-bottom:7px}
+ .recent-list{order:3;display:grid;grid-template-columns:minmax(0,1fr);gap:4px;flex:0 0 auto;min-height:42px;max-height:min(28vh,220px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:0 0 7px}
+ .recent-row{width:100%;max-width:none;min-height:42px;flex:0 0 42px;gap:4px}
+ .recent-row .recent-item{width:auto;min-width:0;min-height:42px;flex:1;padding:7px 8px;font-size:12px}
+ .recent-row .recent-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .recent-row .recent-more,.recent-row:hover .recent-more,.recent-row:focus-within .recent-more{width:38px;height:38px;flex:0 0 38px;opacity:1!important;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface-raised);color:var(--accent-strong);font-size:24px;line-height:1;transition:none}
  .nav-list{order:4;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:8px 0;overflow:visible}
  .nav-item{min-width:0;min-height:38px;justify-content:flex-start;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-raised);font-size:10px;white-space:nowrap}
  .nav-icon{width:20px;flex:0 0 20px}
- .recent-list{display:grid;grid-template-columns:1fr;gap:3px}
- .recent-item{min-height:34px;font-size:10px}
+ .recent-item{min-height:42px;font-size:12px}
  .sidebar-footer{display:none}
  .phone-drawer-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
  .phone-drawer-controls>.studio-action{width:auto;min-width:35px;height:33px;display:inline-flex;justify-content:center;padding:0 9px}
