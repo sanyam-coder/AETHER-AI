@@ -407,6 +407,7 @@ function closeMobileSidebar(returnFocus = false) {
   const menuButton = $("mobileMenu");
   if (!sidebar.classList.contains("open")) return;
   sidebar.classList.remove("open");
+  $("sidebarBackdrop").hidden = true;
   menuButton.setAttribute("aria-expanded", "false");
   if (returnFocus) menuButton.focus();
 }
@@ -439,10 +440,12 @@ $("mobileMenu").setAttribute("aria-controls", "sidebar");
 $("mobileMenu").setAttribute("aria-expanded", "false");
 $("mobileMenu").addEventListener("click", () => {
   const isOpen = $("sidebar").classList.toggle("open");
+  $("sidebarBackdrop").hidden = !isOpen;
   $("mobileMenu").setAttribute("aria-expanded", String(isOpen));
   if (isOpen) $("sidebarBack").focus();
 });
 $("sidebarBack").addEventListener("click", () => closeMobileSidebar(true));
+$("sidebarBackdrop").addEventListener("click", () => closeMobileSidebar(true));
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") closeMobileSidebar(true);
 });
