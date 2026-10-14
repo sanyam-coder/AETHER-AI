@@ -381,7 +381,7 @@ document.addEventListener("click", e => {
       messages = thread.messages.slice(-MAX_MESSAGES);
       localStorage.setItem(ACTIVE_STORAGE, activeThreadId);
       render();
-      document.querySelector(".sidebar").classList.remove("open");
+      closeMobileSidebar();
     }
     return;
   }
@@ -397,8 +397,19 @@ document.addEventListener("click", e => {
     messageInput.focus();
   }
   const modeButton = e.target.closest("[data-mode]");
-  if (modeButton) chooseMode(modeButton.dataset.mode);
+  if (modeButton) {
+    chooseMode(modeButton.dataset.mode);
+    closeMobileSidebar();
+  }
 });
+function closeMobileSidebar(returnFocus = false) {
+  const sidebar = $("sidebar");
+  const menuButton = $("mobileMenu");
+  if (!sidebar.classList.contains("open")) return;
+  sidebar.classList.remove("open");
+  menuButton.setAttribute("aria-expanded", "false");
+  if (returnFocus) menuButton.focus();
+}
 function chooseMode(mode) {
   document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
   if (mode === "files") $("fileInput").click();
@@ -422,9 +433,19 @@ $("newChat").addEventListener("click", () => {
   fileName = "";
   fileAttachment.textContent = "";
   render();
-  document.querySelector(".sidebar").classList.remove("open");
+  closeMobileSidebar();
 });
-$("mobileMenu").addEventListener("click", () => document.querySelector(".sidebar").classList.toggle("open"));
+$("mobileMenu").setAttribute("aria-controls", "sidebar");
+$("mobileMenu").setAttribute("aria-expanded", "false");
+$("mobileMenu").addEventListener("click", () => {
+  const isOpen = $("sidebar").classList.toggle("open");
+  $("mobileMenu").setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) $("sidebarBack").focus();
+});
+$("sidebarBack").addEventListener("click", () => closeMobileSidebar(true));
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeMobileSidebar(true);
+});
 $("profileButton").addEventListener("click", () => toast("Sign-in and cloud accounts are not included in this demo."));
 $("topSpeak").addEventListener("click", () => {
   readReplies = !readReplies;

@@ -47,7 +47,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border-right: 1px solid var(--line);
   background: var(--sidebar);
 }
-.brand { display: flex; align-items: center; gap: 11px; padding: 2px 8px 22px; color: var(--text); text-decoration: none; }
+.sidebar-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.brand { min-width: 0; display: flex; align-items: center; gap: 11px; padding: 2px 8px 22px; color: var(--text); text-decoration: none; }
+.sidebar-back { display: none; }
 .brand-mark { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid #334a71; border-radius: 12px; background: linear-gradient(145deg, #243756, #172338); }
 .brand-mark span { color: #b8ccff; font-size: 28px; line-height: 1; font-weight: 750; font-style: italic; }
 .brand-copy strong { display: block; color: #f2f5fb; font-size: 17px; letter-spacing: .7px; white-space: nowrap; }
@@ -332,6 +334,10 @@ textarea::placeholder { color: #818e9f; }
 @media (max-width: 650px) {
   .sidebar { position: fixed; z-index: 20; top: 0; bottom: 0; left: -290px; width: 270px; min-height: 100vh; overflow-y: auto; box-shadow: 15px 0 40px rgba(0, 0, 0, .38); transition: left .2s ease; }
   .sidebar.open { left: 0; }
+  .sidebar-header { min-height: 54px; margin: -5px 0 14px; padding: 0 2px 8px; border-bottom: 1px solid var(--line); }
+  .sidebar-header .brand { flex: 1; padding: 2px 2px 0; }
+  .sidebar-back { min-height: 36px; display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 5px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--surface-raised); color: var(--text); font-size: 12px; font-weight: 600; }
+  .sidebar-back:hover { border-color: var(--accent); background: var(--surface-soft); }
   .topbar { height: 58px; gap: 8px; padding: 0 10px; }
   .mobile-menu { width: 34px; height: 34px; display: grid; flex: 0 0 34px; }
   .searchbar { height: 36px; gap: 6px; padding: 0 9px; }
