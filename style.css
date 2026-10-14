@@ -795,3 +795,16 @@ body::before{background:radial-gradient(ellipse at 18% 16%,rgba(151,132,255,.15)
  .hero-subtitle{max-width:190px}
  .right-panel{padding-right:8px;padding-left:8px}
 }
+
+
+/* Phone-only order: logo, workspace shortcuts/prompts, then the conversation canvas. */
+@media(max-width:650px){
+ .workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "tools" "chat" "prompts" "composer"}
+ .center-panel{display:contents}
+ .hero{grid-area:hero}
+ .right-panel{grid-area:tools;align-self:start}
+ .chat-area{grid-area:chat;width:100%;max-width:100%;margin:2px 0 0}
+ .prompt-chips{grid-area:prompts;width:calc(100vw - 22px);max-width:none;margin:4px 0 8px}
+ .composer-wrap{grid-area:composer;width:100%;max-width:none;margin:0;padding:0 11px 12px}
+ .language-card{display:none!important}
+}
